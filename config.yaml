@@ -1,0 +1,72 @@
+# CodeKong pipeline configuration.
+# Everything the pipeline might need to swap without code changes lives here.
+
+llm:
+  # provider: "local" (Ollama on http://localhost:11434, free, unlimited, no key)
+  #        or "cloud" (Ollama Cloud, needs OLLAMA_API_KEY in .env, rate-limited
+  #        free tier: 5-hour session limits, weekly caps, one concurrent model.
+  #        Use ONLY as documented fallback for machines that cannot run a 7B
+  #        model locally at usable speed).
+  provider: local
+  # Model tier guidance (run `python -m core.hardware` to probe this machine):
+  #   <=8GB VRAM/RAM : qwen2.5-coder:7b
+  #   12-16GB        : qwen2.5-coder:14b or deepseek-coder-v2:16b-lite-instruct
+  #   >=24GB         : qwen2.5-coder:32b or qwen3-coder:30b
+  # NOTE for the target laptop (RTX 3050 Ti, fixed 4GB VRAM): the 7B model at
+  # Q4 needs ~5-6GB, so Ollama will partially offload to system RAM and run
+  # noticeably slower than published 7B-on-8GB benchmarks. That is EXPECTED on
+  # this card, not a bug. Budget batch runs accordingly.
+  model: qwen2.5-coder:7b
+  local_host: http://localhost:11434
+  cloud_host: https://ollama.com
+  # Determinism requirements from the original design:
+  temperature_testgen: 0.0     # every test-rewriting call (Module 3 / Test Gen Agent)
+  temperature_semantic: 0.7    # semantic mutant generation (Module 1C)
+  request_timeout_seconds: 300 # generous: 4GB-VRAM partial CPU offload is slow
+  call_log: module3_llm/llm_calls.jsonl
+
+rag:
+  embedding_model: all-MiniLM-L6-v2   # sentence-transformers, fully local
+  chroma_path: module2_rag/chroma_db
+  default_k: 5
+  k_values: [3, 5, 8]                 # RQ3 sweep
+
+mutation:
+  max_semantic_llm_calls: 50          # hard cap, Module 1C
+  max_hom_per_function: 3             # hard cap, same-function pairs only
+  max_sdl_per_function: 5             # keep SDL volume comparable to other classes
+  test_timeout_seconds: 10            # subprocess.run(..., timeout=10) per roadmap
+  suite_timeout_seconds: 120          # full existing-suite run for survival checks
+  mutmut_run_timeout_seconds: 3600
+
+agentic:
+  max_retries: 1                      # exactly one retry with validator feedback
+
+subjects:
+  sorts:
+    url: https://github.com/TheAlgorithms/Python
+    path: subjects/algorithms_python
+    subdir: sorts                     # restrict mutation/indexing to sorts/ only
+    # TheAlgorithms sorts/ tests live mostly as doctests inside the modules:
+    test_selection: ["sorts/"]
+    pytest_extra_args: ["--doctest-modules"]
+    # pin_commit is written by setup.sh at first clone and must then be
+    # committed so mutation results stay reproducible.
+    pin_commit: ""
+  schedule:
+    url: https://github.com/dbader/schedule
+    path: subjects/schedule
+    subdir: schedule                  # package dir; tests live at repo root
+    test_selection: ["test_schedule.py"]
+    pytest_extra_args: []
+    pin_commit: ""
+  # Third repo deliberately absent: jFilho/calcpy does not exist as a real
+  # GitHub repository and was dropped per the build spec. Two repos are in
+  # scope. Add a third here only after verifying it clones successfully.
+
+output:
+  surviving_mutants: module1_mutation/surviving_mutants.json
+  rag_context: module2_rag/rag_context.json
+  generated_tests_dir: module3_llm/generated_tests
+  results_dir: module4_eval/results
+  figures_dir: module4_eval/figures

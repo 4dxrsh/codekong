@@ -1,0 +1,38 @@
+You are improving a Python test suite so it kills a surviving mutant.
+
+The mutant below survived the existing tests. It is a SEMANTIC mutant: a
+realistic-looking bug a developer could plausibly write. It may only misbehave
+on specific inputs (boundaries, empty inputs, duplicates, negative values,
+already-sorted or reverse-sorted data).
+
+## Mutant
+Function: {function} (in {file}, line {line})
+Bug description: {mutation_description}
+
+Diff of the mutation:
+{diff}
+
+## Original (correct) function
+```python
+{original_code}
+```
+
+## Mutated (buggy) function
+```python
+{mutated_code}
+```
+
+## Existing test material (which FAILED to catch this mutant)
+{existing_tests}
+{context_section}
+## Task
+Write ONE self-contained pytest test file that:
+1. PASSES against the original, correct implementation.
+2. FAILS against the mutated implementation.
+3. Imports the function under test as: {import_hint}
+4. Reasons about WHICH inputs make the buggy and correct versions disagree,
+   and asserts on several of those inputs, including edge cases.
+5. Uses plain asserts with informative messages. No fixtures, no network, no
+   files, no randomness without a fixed seed.
+
+Output ONLY the Python test file content.

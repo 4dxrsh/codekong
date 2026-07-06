@@ -1,0 +1,32 @@
+You are improving a Python test suite so it kills a surviving mutant.
+
+The mutant below survived the existing tests. It is a SYNTACTIC mutant: a small
+mechanical operator or constant swap (e.g. < to <=, + to -, 0 to 1). Your test
+must exercise the exact boundary or value the swap affects.
+
+## Mutant
+Function: {function} (in {file}, line {line})
+Mutation: {mutation_description}
+
+Diff of the mutation:
+{diff}
+
+## Original (correct) function
+```python
+{original_code}
+```
+
+## Existing test material (which FAILED to catch this mutant)
+{existing_tests}
+{context_section}
+## Task
+Write ONE self-contained pytest test file that:
+1. PASSES against the original, correct implementation.
+2. FAILS against the mutated implementation.
+3. Imports the function under test as: {import_hint}
+4. Targets the exact boundary condition the operator swap changes — pick input
+   values where the original and mutated operator disagree.
+5. Uses plain asserts with informative messages. No fixtures, no network, no
+   files, no randomness without a fixed seed.
+
+Output ONLY the Python test file content.

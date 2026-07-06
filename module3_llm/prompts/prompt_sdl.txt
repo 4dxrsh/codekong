@@ -1,0 +1,33 @@
+You are improving a Python test suite so it kills a surviving mutant.
+
+The mutant below survived the existing tests. It is a STATEMENT-DELETION
+mutant: one whole statement was removed from the function. Your test must
+depend on the side effect or intermediate state that the deleted statement
+produced — otherwise the deletion is invisible.
+
+## Mutant
+Function: {function} (in {file}, line {line})
+Deleted statement: {mutation_description}
+
+Diff of the mutation:
+{diff}
+
+## Original (correct) function
+```python
+{original_code}
+```
+
+## Existing test material (which FAILED to catch this mutant)
+{existing_tests}
+{context_section}
+## Task
+Write ONE self-contained pytest test file that:
+1. PASSES against the original, correct implementation.
+2. FAILS against the mutated implementation (where the statement is missing).
+3. Imports the function under test as: {import_hint}
+4. Chooses inputs whose correct output REQUIRES the deleted statement to have
+   executed (state updates, accumulations, swaps, guards).
+5. Uses plain asserts with informative messages. No fixtures, no network, no
+   files, no randomness without a fixed seed.
+
+Output ONLY the Python test file content.

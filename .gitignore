@@ -1,0 +1,16 @@
+venv/
+.env
+__pycache__/
+*.pyc
+*.pyo
+module2_rag/chroma_db/
+module3_llm/generated_tests/*.pyc
+module3_llm/llm_calls.jsonl
+subjects/*/
+!subjects/pins.json
+mutants/
+.mutmut-cache
+.pytest_cache/
+*.egg-info/
+.coverage
+module1_mutation/_scratch/

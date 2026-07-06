@@ -1,0 +1,39 @@
+You are improving a Python test suite so it kills a surviving mutant.
+
+The mutant below survived the existing tests. It is a HIGHER-ORDER mutant: TWO
+independent first-order mutations combined in the same function. The
+combination may partially mask each component's effect (the two bugs can
+cancel out on easy inputs), so naive inputs often still pass.
+
+## Mutant
+Function: {function} (in {file}, line {line})
+Component mutations: {mutation_description}
+
+Diff of the combined mutation:
+{diff}
+
+## Original (correct) function
+```python
+{original_code}
+```
+
+## Mutated (buggy) function
+```python
+{mutated_code}
+```
+
+## Existing test material (which FAILED to catch this mutant)
+{existing_tests}
+{context_section}
+## Task
+Write ONE self-contained pytest test file that:
+1. PASSES against the original, correct implementation.
+2. FAILS against the mutated implementation.
+3. Imports the function under test as: {import_hint}
+4. Finds inputs where the two component bugs do NOT cancel out — probe each
+   component mutation's boundary separately AND jointly, and assert on inputs
+   that expose at least one component regardless of masking.
+5. Uses plain asserts with informative messages. No fixtures, no network, no
+   files, no randomness without a fixed seed.
+
+Output ONLY the Python test file content.
