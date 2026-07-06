@@ -1,27 +1,50 @@
 #!/usr/bin/env bash
-# CodeKong Phase 0 bootstrap — run INSIDE WSL2 Ubuntu, from the repo root.
-# Idempotent: safe to re-run. See README for the zero-state WSL2 install steps
-# (this script assumes WSL2 Ubuntu itself already exists).
+# CodeKong Phase 0 bootstrap — run from the repo root.
+#   Linux target : WSL2 Ubuntu (see README "Setting up WSL2 from zero")
+#   macOS target : Apple Silicon or Intel, needs Homebrew (https://brew.sh)
+# Idempotent: safe to re-run.
 set -euo pipefail
 cd "$(dirname "$0")"
 
+OS="$(uname -s)"
+
 echo "== 0. Environment sanity =="
-if ! uname -r | grep -qi microsoft; then
-  echo "WARNING: this does not look like WSL2 (uname -r: $(uname -r))."
-  echo "mutmut needs fork(); any real Linux works, but WSL2 is the documented target."
-fi
-if command -v nvidia-smi >/dev/null 2>&1; then
-  nvidia-smi --query-gpu=name,memory.total --format=csv || true
+if [ "$OS" = "Darwin" ]; then
+  echo "macOS detected: $(sysctl -n machdep.cpu.brand_string 2>/dev/null || uname -m)"
+  echo "RAM: $(( $(sysctl -n hw.memsize) / 1024 / 1024 / 1024 )) GB unified memory"
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "ERROR: Homebrew is required on macOS. Install it first:"
+    echo '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    exit 1
+  fi
 else
-  echo "nvidia-smi not found. If this laptop has the RTX 3050 Ti, update the"
-  echo "NVIDIA driver on the WINDOWS host (WSL2 uses it directly; there is no"
-  echo "separate Linux driver). Continuing on CPU is possible but slow."
+  if ! uname -r | grep -qi microsoft; then
+    echo "WARNING: this does not look like WSL2 (uname -r: $(uname -r))."
+    echo "mutmut needs fork(); any real Linux works, but WSL2 is the documented target."
+  fi
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    nvidia-smi --query-gpu=name,memory.total --format=csv || true
+  else
+    echo "nvidia-smi not found. If this laptop has the RTX 3050 Ti, update the"
+    echo "NVIDIA driver on the WINDOWS host (WSL2 uses it directly; there is no"
+    echo "separate Linux driver). Continuing on CPU is possible but slow."
+  fi
 fi
 
 echo "== 1. Python venv + dependencies =="
-sudo apt-get update -y
-sudo apt-get install -y python3-venv python3-pip git curl
-[ -d venv ] || python3 -m venv venv
+if [ "$OS" = "Darwin" ]; then
+  command -v git >/dev/null 2>&1 || brew install git
+  # Use a Homebrew Python (Apple's system python3 is often outdated/locked).
+  if ! command -v python3.11 >/dev/null 2>&1 && ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3,10) else 1)' 2>/dev/null; then
+    brew install python@3.11
+  fi
+  PY=$(command -v python3.11 || command -v python3)
+else
+  sudo apt-get update -y
+  sudo apt-get install -y python3-venv python3-pip git curl
+  PY=python3
+fi
+[ -d venv ] || "$PY" -m venv venv
 # shellcheck disable=SC1091
 source venv/bin/activate
 pip install --upgrade pip
@@ -31,23 +54,30 @@ echo "Exact tested versions frozen to requirements.lock.txt — commit it."
 
 echo "== 2. Ollama (local, free, no API key) =="
 if ! command -v ollama >/dev/null 2>&1; then
-  curl -fsSL https://ollama.com/install.sh | sh
+  if [ "$OS" = "Darwin" ]; then
+    brew install ollama
+  else
+    curl -fsSL https://ollama.com/install.sh | sh
+  fi
 fi
-# Start the server if it isn't running (WSL2 has no systemd by default in
-# older setups; `ollama serve &` covers that case).
+# Start the server if it isn't running. (macOS alternative: `brew services
+# start ollama`, or just launch the Ollama app if you installed the .dmg.)
 if ! curl -s http://localhost:11434 >/dev/null 2>&1; then
   nohup ollama serve >/tmp/ollama.log 2>&1 &
   sleep 3
 fi
 
-MODEL=$(venv/bin/python -m core.hardware | python3 -c \
+MODEL=$(venv/bin/python -m core.hardware | venv/bin/python -c \
   "import sys,json; print(json.load(sys.stdin)['recommended_model'])")
 CONFIG_MODEL=$(venv/bin/python -c \
   "from core.config import load_config; print(load_config()['llm']['model'])")
 echo "Hardware probe recommends: $MODEL — config.yaml says: $CONFIG_MODEL (config wins)"
+if [ "$MODEL" != "$CONFIG_MODEL" ]; then
+  echo "NOTE: if this machine can handle $MODEL, edit llm.model in config.yaml."
+fi
 ollama pull "$CONFIG_MODEL"
-echo "-- verification call (watch the speed: instant-ish = GPU, crawling = CPU/partial offload,"
-echo "   the latter is EXPECTED on a 4GB RTX 3050 Ti) --"
+echo "-- verification call (watch the speed: fast = GPU/Metal in use, crawling = CPU"
+echo "   or partial offload; the latter is EXPECTED on a 4GB RTX 3050 Ti) --"
 ollama run "$CONFIG_MODEL" "write a one-line python function"
 
 echo "== 3. Subject repos (cloned + pinned) =="

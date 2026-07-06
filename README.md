@@ -19,6 +19,10 @@ Everything is free and local: mutmut, pytest, Python `ast`,
 sentence-transformers (all-MiniLM-L6-v2), ChromaDB, pandas, matplotlib, and
 a local Ollama model. No Anthropic/OpenAI SDKs anywhere in this codebase.
 
+Supported environments: WSL2 Ubuntu on Windows (primary target, steps below)
+and macOS (Apple Silicon or Intel — mutmut runs natively, Ollama uses Metal
+on Apple Silicon; install Homebrew, then `bash setup.sh` handles the rest).
+
 ## Setting up WSL2 from zero (Windows 11 Home, nothing installed)
 
 The pipeline must run inside WSL2 Ubuntu. This is forced, not stylistic:

@@ -1,10 +1,12 @@
 """Environment guards.
 
-mutmut requires fork(), which only a real or virtual Linux kernel provides.
-The target environment is WSL2 Ubuntu on the user's laptop. This guard fails
-loudly BEFORE mutmut ever runs, instead of letting mutmut die with a cryptic
-fork-related error when someone launches the pipeline from Windows PowerShell
-or an old VMware VM out of habit.
+mutmut requires fork(), which only a real POSIX kernel provides (Linux —
+including WSL2 — or macOS). The primary documented target is WSL2 Ubuntu on
+the project laptop; macOS is a supported secondary target (mutmut runs
+natively there and auto-disables the fork-unsafe setproctitle library on
+macOS). This guard fails loudly BEFORE mutmut ever runs on plain Windows,
+instead of letting mutmut die with a cryptic fork-related error when someone
+launches the pipeline from PowerShell or an old VMware VM out of habit.
 """
 from __future__ import annotations
 
@@ -27,10 +29,12 @@ def is_wsl2() -> bool:
 def assert_fork_capable_linux(require_wsl: bool = False) -> None:
     """Fail loudly if mutmut cannot possibly work here.
 
-    - Windows / macOS-without-fork-safety: hard fail with instructions.
-    - Real Linux that is NOT WSL2 (e.g. a native Ubuntu box or CI container):
-      allowed with a notice, because fork works there too. Set require_wsl=True
-      (or CODEKONG_REQUIRE_WSL=1) to hard-fail on anything but WSL2.
+    - Windows: hard fail with instructions (no fork()).
+    - macOS: allowed with a notice (fork works; Ollama uses Metal on Apple
+      Silicon; nvidia-smi/WSL guidance does not apply).
+    - Real Linux that is NOT WSL2 (native Ubuntu, CI container): allowed with
+      a notice. Set require_wsl=True (or CODEKONG_REQUIRE_WSL=1) to hard-fail
+      on anything but WSL2.
     """
     if sys.platform.startswith("win"):
         raise EnvironmentGuardError(
@@ -41,10 +45,17 @@ def assert_fork_capable_linux(require_wsl: bool = False) -> None:
             "Do NOT use the old VMware VM: it cannot reach the RTX 3050 Ti, "
             "and WSL2 can."
         )
+    if sys.platform == "darwin":
+        print("[guards] Note: running on macOS. fork() works and mutmut "
+              "supports this platform natively; the WSL2/nvidia-smi guidance "
+              "in the README applies only to the Windows laptop.",
+              file=sys.stderr)
+        return
     if not sys.platform.startswith("linux"):
         raise EnvironmentGuardError(
-            f"Unsupported platform {sys.platform!r}: mutmut needs a Linux "
-            "kernel with fork(). Use WSL2 Ubuntu as described in the README."
+            f"Unsupported platform {sys.platform!r}: mutmut needs a POSIX "
+            "kernel with fork(). Use WSL2 Ubuntu (or macOS) as described in "
+            "the README."
         )
     want_wsl = require_wsl or os.environ.get("CODEKONG_REQUIRE_WSL") == "1"
     if not is_wsl2():
