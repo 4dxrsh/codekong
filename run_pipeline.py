@@ -16,7 +16,7 @@ from pathlib import Path
 
 from core import schema
 from core.config import load_config, resolve
-from core.guards import assert_fork_capable_linux
+from core.guards import assert_fork_capable_linux, assert_not_windows_mount
 from core.hardware import recommend_model
 
 
@@ -97,6 +97,7 @@ def main():
     args = ap.parse_args()
 
     cfg = load_config()
+    assert_not_windows_mount(cfg["_project_root"])
     if args.repo not in cfg["subjects"]:
         sys.exit(f"unknown --repo {args.repo!r}; configured: "
                  f"{list(cfg['subjects'])}")

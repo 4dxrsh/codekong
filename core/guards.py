@@ -68,3 +68,27 @@ def assert_fork_capable_linux(require_wsl: bool = False) -> None:
         if want_wsl:
             raise EnvironmentGuardError(msg + " CODEKONG_REQUIRE_WSL=1 is set, aborting.")
         print(f"[guards] {msg}", file=sys.stderr)
+
+
+def assert_not_windows_mount(project_root) -> None:
+    """Refuse to run the pipeline from /mnt/<drive>/ inside WSL2.
+
+    The Windows drive mount (drvfs/9p) caches file metadata. This pipeline
+    rewrites source files in place during mutant application, and stale
+    metadata can make Python's bytecode cache serve PRE-mutation code — the
+    mutant silently never executes and every result is garbage. We hit this
+    exact failure during development. The project must live on the Linux
+    filesystem (e.g. ~/codekong).
+    """
+    p = str(project_root)
+    if is_wsl2() and len(p) > 6 and p.startswith("/mnt/") and p[6] == "/":
+        raise EnvironmentGuardError(
+            f"CodeKong is running from the Windows drive mount ({p}). This "
+            "corrupts mutation results (stale-metadata bytecode caching) and "
+            "is refused outright. Copy the project to your Linux home and "
+            "run it there:\n"
+            f"    cp -r {p} ~/codekong\n"
+            "    cd ~/codekong\n"
+            "    rm -rf venv subjects module1_mutation/_scratch\n"
+            "    bash setup.sh"
+        )

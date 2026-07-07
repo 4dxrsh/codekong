@@ -18,6 +18,16 @@ if [ "$OS" = "Darwin" ]; then
     exit 1
   fi
 else
+  if uname -r | grep -qi microsoft && [[ "$(pwd)" == /mnt/?/* ]]; then
+    echo "ERROR: you are running from the Windows drive mount ($(pwd))."
+    echo "This corrupts mutation results (stale-metadata bytecode caching)."
+    echo "Copy the project to your Linux home and run it there:"
+    echo "    cp -r $(pwd) ~/codekong"
+    echo "    cd ~/codekong"
+    echo "    rm -rf venv subjects module1_mutation/_scratch"
+    echo "    bash setup.sh"
+    exit 1
+  fi
   if ! uname -r | grep -qi microsoft; then
     echo "WARNING: this does not look like WSL2 (uname -r: $(uname -r))."
     echo "mutmut needs fork(); any real Linux works, but WSL2 is the documented target."
