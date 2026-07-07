@@ -3,7 +3,8 @@ file" flow. Read-only over real pipeline outputs (no invented numbers; every
 missing dataset renders an explicit empty state), plus a background-job
 wrapper around generate_tests.generate_tests_for_file for uploads.
 
-Run:  source venv/bin/activate && python -m frontend.app
+Palette: warm dark (terracotta / peach / sand on brown-black), serif display
+headings. Run:  source venv/bin/activate && python -m frontend.app
 Then open http://localhost:5001
 """
 from __future__ import annotations
@@ -27,33 +28,40 @@ UPLOADS = PROJECT_ROOT / "frontend" / "uploads"
 JOBS: dict[str, dict] = {}
 _JOBS_LOCK = threading.Lock()
 
-# Apple-system accent palette, rendered as translucent chips.
-BADGE = {"syntactic": "#bf5af2", "sdl": "#64d2ff", "semantic": "#ffd60a",
-         "higher_order": "#ff453a", "RAG": "#2997ff", "NO_RAG": "#98989d"}
+# Pipeline stages shown in the Generate job stepper (must mirror the
+# progress-callback stages in generate_tests.generate_tests_for_file).
+STAGES = ["Scaffold", "Mutate & filter", "Index", "Generate & validate", "Package"]
+
+# Warm translucent chips.
+BADGE = {"syntactic": "#c9a0e8", "sdl": "#8fc8b5", "semantic": "#d9b96e",
+         "higher_order": "#e06a55", "RAG": "#e0795a", "NO_RAG": "#9a8f82",
+         "generated": "#9a8f82", "description": "#d9c7a7"}
 
 BASE = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CodeKong — {{ title }}</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--bg:#0b0b0f;--panel:#151519;--line:#26262c;--ink:#f5f5f7;--muted:#86868b;
---accent:#2997ff;--green:#30d158;--red:#ff453a;--radius:14px}
+:root{--bg:#131010;--panel:#1b1714;--line:#2b241e;--ink:#f2eae0;--muted:#9a8f82;
+--accent:#e0795a;--peach:#f2b28c;--sand:#d9c7a7;--green:#7fc98f;--red:#e06a55;--radius:14px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
 font:15px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased}
 nav{position:sticky;top:0;z-index:10;display:flex;gap:28px;align-items:center;
-height:52px;padding:0 max(24px,calc(50vw - 540px));
-background:rgba(11,11,15,.72);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
-nav .brand{font-weight:700;font-size:16px;letter-spacing:-.02em;color:var(--ink)}
+height:54px;padding:0 max(24px,calc(50vw - 540px));
+background:rgba(19,16,16,.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+nav .brand{font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--sand);
+font-family:"New York",Georgia,"Times New Roman",serif}
 nav a{color:var(--muted);text-decoration:none;font-size:13.5px;transition:color .15s}
-nav a:hover{color:var(--ink)} nav a.active{color:var(--ink)}
-main{max-width:1080px;margin:0 auto;padding:48px 24px 110px}
-h1{font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin:.1em 0 .4em}
-h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:2.2em}
-h3{font-weight:600;color:var(--muted);text-transform:uppercase;
-letter-spacing:.06em;font-size:12.5px}
-p{color:#d5d5da} .muted{color:var(--muted)}
+nav a:hover{color:var(--ink)} nav a.active{color:var(--peach)}
+main{max-width:1080px;margin:0 auto;padding:52px 24px 110px}
+h1{font-size:42px;font-weight:600;letter-spacing:-.02em;line-height:1.12;margin:.1em 0 .4em;
+font-family:"New York",Georgia,"Times New Roman",serif}
+h2{font-size:25px;font-weight:600;letter-spacing:-.01em;margin-top:2.2em;
+font-family:"New York",Georgia,"Times New Roman",serif;color:var(--sand)}
+h3{font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+p{color:#d9d0c4} .muted{color:var(--muted)}
 .lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:46em;font-weight:400}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
 padding:24px 28px;margin:18px 0}
@@ -61,52 +69,64 @@ padding:24px 28px;margin:18px 0}
 @media(max-width:800px){.grid2{grid-template-columns:1fr}}
 .chip{display:inline-block;padding:2px 11px;border-radius:980px;font-size:12px;font-weight:600}
 table.data{width:100%;border-collapse:collapse;font-size:13.5px}
-table.data th{color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;
-letter-spacing:.05em;text-align:left;padding:10px;border-bottom:1px solid var(--line)}
+table.data th{color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;
+letter-spacing:.06em;text-align:left;padding:10px;border-bottom:1px solid var(--line)}
 table.data td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
-tr.rowlink{cursor:pointer;transition:background .12s} tr.rowlink:hover{background:#1b1b21}
+tr.rowlink{cursor:pointer;transition:background .12s} tr.rowlink:hover{background:#221d18}
 pre,code,.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
-code{background:#1e1e24;padding:1px 6px;border-radius:6px;font-size:13px}
-pre{background:#101014;border:1px solid var(--line);color:#e8e8ed;padding:16px 18px;
+code{background:#241e19;padding:1px 6px;border-radius:6px;font-size:13px;color:var(--peach)}
+pre{background:#100d0b;border:1px solid var(--line);color:#e9e1d5;padding:16px 18px;
 border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
-table.diff{width:100%;border-collapse:collapse;font-size:12.5px;background:#101014;
+table.diff{width:100%;border-collapse:collapse;font-size:12.5px;background:#100d0b;
 border-radius:12px;overflow:hidden;border:1px solid var(--line)}
 table.diff td{padding:1.5px 10px;white-space:pre;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
-table.diff td.ln{color:#48484f;text-align:right;width:36px;user-select:none}
-tr.del td.code{background:rgba(255,69,58,.14)} tr.add td.code{background:rgba(48,209,88,.12)}
+table.diff td.ln{color:#514639;text-align:right;width:36px;user-select:none}
+tr.del td.code{background:rgba(224,106,85,.15)} tr.add td.code{background:rgba(127,201,143,.11)}
 tr.del td.code::before{content:"− ";color:var(--red)} tr.add td.code::before{content:"+ ";color:var(--green)}
 .pass{color:var(--green);font-weight:600}.fail{color:var(--red);font-weight:600}
-.pill-pass{background:rgba(48,209,88,.15);color:var(--green);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
-.pill-fail{background:rgba(255,69,58,.15);color:var(--red);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
+.pill-pass{background:rgba(127,201,143,.14);color:var(--green);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
+.pill-fail{background:rgba(224,106,85,.15);color:var(--red);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
 .empty{padding:34px;text-align:center;color:var(--muted);background:var(--panel);
 border:1px dashed var(--line);border-radius:var(--radius)}
 .pipeline{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
-.stage{flex:1 1 150px;background:#101014;border:1px solid var(--line);border-radius:12px;
+.stage{flex:1 1 150px;background:#100d0b;border:1px solid var(--line);border-radius:12px;
 padding:12px 14px;font-size:12.5px;color:var(--muted)}
-.stage b{display:block;color:var(--ink);font-size:13px;margin-bottom:3px}
+.stage b{display:block;color:var(--peach);font-size:13px;margin-bottom:3px}
 .arrow{align-self:center;color:var(--muted)}
+.stepper{display:flex;margin:8px 0 4px}
+.step{flex:1;text-align:center;position:relative;color:var(--muted);font-size:12px;z-index:1}
+.step .dot{width:28px;height:28px;border-radius:50%;margin:0 auto 8px;display:flex;
+align-items:center;justify-content:center;background:#241e19;border:1.5px solid var(--line);
+font-weight:700;font-size:12.5px}
+.step.done{color:var(--sand)} .step.done .dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.step.active{color:var(--peach)} .step.active .dot{border-color:var(--accent);color:var(--peach);
+animation:pulse 1.4s infinite}
+.step:not(:first-child)::before{content:"";position:absolute;top:14px;left:-50%;width:100%;
+height:2px;background:var(--line);z-index:-1}
+.step.done:not(:first-child)::before,.step.active:not(:first-child)::before{background:var(--accent)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,121,90,.35)}50%{box-shadow:0 0 0 8px rgba(224,121,90,0)}}
 details.ast{margin-left:15px;font-size:13px}
-details.ast>summary{cursor:pointer;padding:1px 6px;border-radius:6px;color:#c8c8cf;list-style:none}
+details.ast>summary{cursor:pointer;padding:1px 6px;border-radius:6px;color:#cfc5b6;list-style:none}
 details.ast>summary::before{content:"▸ ";color:var(--muted);font-size:10px}
 details[open].ast>summary::before{content:"▾ "}
-details.ast>summary.marked{background:rgba(255,214,10,.16);color:#ffd60a;font-weight:600}
-details.ast>summary:hover{background:#1b1b21}
+details.ast>summary.marked{background:rgba(217,185,110,.18);color:#d9b96e;font-weight:600}
+details.ast>summary:hover{background:#221d18}
 input[type=text],textarea,select{width:100%;padding:10px 13px;border:1px solid var(--line);
-border-radius:10px;font-size:14px;background:#101014;color:var(--ink);outline:none}
+border-radius:10px;font-size:14px;background:#100d0b;color:var(--ink);outline:none}
 input:focus,textarea:focus{border-color:var(--accent)}
 select{width:auto}
 button,.btn{background:var(--accent);color:#fff;border:0;border-radius:980px;
 padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;
 display:inline-block;transition:opacity .15s}
 button:hover,.btn:hover{opacity:.85}
-.refs li{margin-bottom:11px;font-size:13.5px;color:#d5d5da} .refs .why{color:var(--muted)}
+.refs li{margin-bottom:11px;font-size:13.5px;color:#d9d0c4} .refs .why{color:var(--muted)}
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
 padding:16px;text-align:center}
-.stat .v{font-size:27px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.stat .v{font-size:27px;font-weight:700;letter-spacing:-.02em;color:var(--peach)}
 .stat .l{font-size:12px;color:var(--muted)}
-a{color:var(--accent);text-decoration:none}
-label{color:#d5d5da;font-size:14px}
+a{color:var(--peach);text-decoration:none}
+label{color:#d9d0c4;font-size:14px}
 </style></head><body>
 <nav><span class="brand">CodeKong</span>
 <a href="/" class="{{ 'active' if page=='home' }}">Home</a>
@@ -114,9 +134,10 @@ label{color:#d5d5da;font-size:14px}
 <a href="/explore" class="{{ 'active' if page=='explore' }}">Explore</a>
 <a href="/passed-tests" class="{{ 'active' if page=='passed' }}">Passed Tests</a>
 <a href="/generate" class="{{ 'active' if page=='generate' }}">Generate</a>
+<a href="/about" class="{{ 'active' if page=='about' }}">About</a>
 </nav><main>{{ body|safe }}</main>
-<script>if (window.Chart){Chart.defaults.color='#86868b';
-Chart.defaults.borderColor='#26262c';Chart.defaults.font.family='-apple-system,Segoe UI,Roboto,sans-serif';}</script>
+<script>if (window.Chart){Chart.defaults.color='#9a8f82';
+Chart.defaults.borderColor='#2b241e';Chart.defaults.font.family='-apple-system,Segoe UI,Roboto,sans-serif';}</script>
 </body></html>"""
 
 
@@ -126,7 +147,7 @@ def page(title, pg, body, **ctx):
 
 
 def badge(kind: str) -> str:
-    c = BADGE.get(kind, "#98989d")
+    c = BADGE.get(kind, "#9a8f82")
     return (f'<span class="chip" style="background:{_rgba(c, .16)};'
             f'color:{c}">{kind}</span>')
 
@@ -157,7 +178,7 @@ def is_valid_password(pw):
     return len(pw) &gt;= 8</pre>
 <pre># Mutant (&gt;= becomes &gt;)
 def is_valid_password(pw):
-    return len(pw) <span style="background:rgba(255,69,58,.25);border-radius:4px;padding:0 5px">&gt;</span> 8</pre>
+    return len(pw) <span style="background:rgba(224,106,85,.25);border-radius:4px;padding:0 5px">&gt;</span> 8</pre>
 </div>
 <p class="muted"><i>If the test suite never checks a password of exactly length 8, this
 mutant survives — and that survival is exactly the blind spot mutation testing exists to find.</i></p>
@@ -201,6 +222,29 @@ def home():
     return page("Home", "home", HOME)
 
 
+# ------------------------------------------------------------------ About
+# EDIT HERE: replace the placeholder strings below with the real details
+# (project blurb, team members, course/institution, acknowledgements).
+ABOUT = """
+<h1>About</h1>
+<p class="lede">CodeKong is a capstone research project on RAG-grounded mutation testing —
+built end to end on free, local tooling.</p>
+<div class="card"><h3>The project</h3>
+<p class="muted">— details to be added —</p></div>
+<div class="card"><h3>The team</h3>
+<p class="muted">— details to be added —</p></div>
+<div class="card"><h3>Course &amp; institution</h3>
+<p class="muted">— details to be added —</p></div>
+<div class="card"><h3>Acknowledgements</h3>
+<p class="muted">— details to be added —</p></div>
+"""
+
+
+@app.route("/about")
+def about():
+    return page("About", "about", ABOUT)
+
+
 # --------------------------------------------------------------------- RQs
 RQ = """
 <h1>Research Questions</h1>
@@ -232,17 +276,17 @@ const D = {{ d | tojson }};
 if (D.rq1 && Object.keys(D.rq1).length) new Chart(document.getElementById('c1'), {type:'bar',
  data:{labels:Object.keys(D.rq1), datasets:[{label:'kill rate',
  data:Object.values(D.rq1).map(x=>x.kill_rate),
- backgroundColor:['#98989d','#2997ff'], borderRadius:8}]},
+ backgroundColor:['#9a8f82','#e0795a'], borderRadius:8}]},
  options:{scales:{y:{min:0,max:1}},plugins:{legend:{display:false}}}});
 if (D.rq2 && D.rq2.classes) new Chart(document.getElementById('c2'), {type:'bar',
  data:{labels:D.rq2.classes, datasets:[
- {label:'NO_RAG', data:D.rq2.norag, backgroundColor:'#98989d', borderRadius:8},
- {label:'RAG', data:D.rq2.rag, backgroundColor:'#2997ff', borderRadius:8}]},
+ {label:'NO_RAG', data:D.rq2.norag, backgroundColor:'#9a8f82', borderRadius:8},
+ {label:'RAG', data:D.rq2.rag, backgroundColor:'#e0795a', borderRadius:8}]},
  options:{scales:{y:{min:0,max:1,title:{display:true,text:'kill rate'}}}}});
 if (D.rq3 && D.rq3.k) new Chart(document.getElementById('c3'), {type:'line',
  data:{labels:D.rq3.k, datasets:[
- {label:'kill rate', data:D.rq3.kill_rate, borderColor:'#2997ff', tension:.3},
- {label:'valid test rate', data:D.rq3.valid_test_rate, borderColor:'#30d158', tension:.3}]},
+ {label:'kill rate', data:D.rq3.kill_rate, borderColor:'#e0795a', tension:.3},
+ {label:'valid test rate', data:D.rq3.valid_test_rate, borderColor:'#d9c7a7', tension:.3}]},
  options:{scales:{y:{min:0,max:1},x:{title:{display:true,text:'retrieval depth K'}}}}});
 </script>
 """
@@ -336,7 +380,7 @@ def explore():
 
 DETAIL = """
 <p><a href="/explore">← Explore</a></p>
-<h1 class="mono" style="font-size:21px">{{ mid }}</h1>
+<h1 class="mono" style="font-size:21px;font-family:ui-monospace,Menlo,monospace">{{ mid }}</h1>
 {% if m %}
 <p>{{ badge(m.mutation_class)|safe }} &nbsp;<code>{{ m.file }}</code> ·
 <code>{{ m.function }}</code> (line {{ m.line }}) — <span class="muted">{{ m.mutation_description }}</span></p>
@@ -359,7 +403,7 @@ every changed region above is highlighted, not just one.</p>{% endif %}</div>
 <div class="card"><b>{{ badge(t.condition)|safe }}{% if t.k %} k={{ t.k }}{% endif %}
 &nbsp;attempt {{ t.attempt }}</b> · <span class="{{ 'pass' if t.passed else 'fail' }}">
 {{ 'KILL — passed on original, failed on mutant' if t.passed else 'NO KILL' }}</span>
-{{ badge('generated' if t.origin == 'generated' else t.origin)|safe }}
+{{ badge(t.origin)|safe }}
 <p class="muted">{{ t.reason }}</p>
 {% if t.code %}<pre>{{ t.code }}</pre>{% endif %}</div>
 {% endfor %}
@@ -441,7 +485,7 @@ GENERATE = """
 that provably pass on your code and fail on a specific injected bug.</p>
 <div class="card"><form method="post" enctype="multipart/form-data">
 <p><label>Python file (.py)<br><input type="file" name="pyfile" accept=".py" required
- style="margin-top:6px;color:#d5d5da"></label></p>
+ style="margin-top:6px;color:#d9d0c4"></label></p>
 <p><label>What does this code do? <span class="muted">(context given to the model)</span><br>
 <textarea name="description" rows="3" required style="margin-top:6px"
  placeholder="e.g. Utility functions for clamping and interpolating numeric ranges"></textarea></label></p>
@@ -462,8 +506,17 @@ Constraints: pure Python, deterministic, no required file/network I/O.</p></form
 JOB = """
 <p><a href="/generate">← Generate</a></p>
 <h1 style="font-size:26px">{{ j.filename }} <span class="muted mono" style="font-size:15px">{{ j.id[:8] }}</span></h1>
-{% if j.status == 'running' %}<div class="empty">Running… started {{ j.age }}s ago.
-This page refreshes every 5 seconds. Local generation takes minutes per mutant.</div>
+
+<div class="card"><div class="stepper">
+{% for s in stages %}<div class="step {{ 'done' if (j.status != 'running') or loop.index0 < j.stage
+ else ('active' if loop.index0 == j.stage else '') }}">
+<div class="dot">{% if (j.status != 'running') or loop.index0 < j.stage %}✓{% else %}{{ loop.index }}{% endif %}</div>
+{{ s }}</div>{% endfor %}
+</div>
+{% if j.status == 'running' %}<p style="text-align:center" class="muted">
+{{ j.detail or 'starting…' }} · {{ j.age }}s elapsed · this page refreshes every 5 s</p>{% endif %}</div>
+
+{% if j.status == 'running' %}
 <script>setTimeout(()=>location.reload(), 5000)</script>
 {% elif j.status == 'error' %}<div class="card"><span class="fail">FAILED</span>
 <pre>{{ j.error }}</pre></div>
@@ -495,12 +548,19 @@ The per-mutant records in the report JSON say which.</div>{% endif %}
 def _run_job(job_id: str, path: Path, description: str, limit: int,
              skip_semantic: bool, use_rag: bool):
     from generate_tests import generate_tests_for_file
+
+    def cb(stage: int, detail: str):
+        with _JOBS_LOCK:
+            if job_id in JOBS:
+                JOBS[job_id].update(stage=stage, detail=detail)
+
     try:
         report = generate_tests_for_file(path, description, limit=limit,
                                          skip_semantic=skip_semantic,
-                                         use_rag=use_rag)
+                                         use_rag=use_rag, progress=cb)
         with _JOBS_LOCK:
-            JOBS[job_id].update(status="done", report=report)
+            JOBS[job_id].update(status="done", report=report,
+                                stage=len(STAGES) - 1)
     except Exception as exc:  # surfaced verbatim in the UI — no papering over
         import traceback
         with _JOBS_LOCK:
@@ -525,6 +585,7 @@ def generate():
         with _JOBS_LOCK:
             JOBS[job_id] = {"id": job_id, "filename": f.filename,
                             "status": "running", "started": time.time(),
+                            "stage": 0, "detail": "",
                             "report": None, "error": None}
         threading.Thread(target=_run_job, daemon=True,
                          args=(job_id, dest, request.form["description"],
@@ -543,12 +604,15 @@ def job_page(job_id):
     if not j:
         abort(404)
     j["age"] = int(time.time() - j["started"])
+    j.setdefault("stage", 0)
+    j.setdefault("detail", "")
     preview = ""
     if j.get("report") and j["report"].get("output_test_file"):
         p = Path(j["report"]["output_test_file"])
         if p.exists():
             preview = p.read_text(encoding="utf-8")[:3000]
-    return page(f"Job {job_id[:8]}", "generate", JOB, j=j, preview=preview)
+    return page(f"Job {job_id[:8]}", "generate", JOB, j=j, preview=preview,
+                stages=STAGES)
 
 
 @app.route("/generate/job/<job_id>/download")

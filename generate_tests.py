@@ -95,8 +95,21 @@ def generate_tests_for_file(file_path: str | Path, description: str,
                             k: int | None = None, limit: int | None = None,
                             use_mutmut: bool = False, use_rag: bool = True,
                             skip_semantic: bool = False,
-                            cfg: dict | None = None, client=None) -> dict:
-    """Full pipeline for one user file. Returns a JSON-serializable report."""
+                            cfg: dict | None = None, client=None,
+                            progress=None) -> dict:
+    """Full pipeline for one user file. Returns a JSON-serializable report.
+
+    progress: optional callable(stage:int, detail:str) — purely additive UI
+    hook (stages 0..4: scaffold, mutate+filter, index, generate+validate,
+    package). Never affects pipeline behavior; failures in it are swallowed.
+    """
+    def _p(stage: int, detail: str = ""):
+        if progress is not None:
+            try:
+                progress(stage, detail)
+            except Exception:
+                pass
+
     t0 = time.time()
     file_path = Path(file_path).resolve()
     if not file_path.is_file() or file_path.suffix != ".py":
@@ -104,6 +117,7 @@ def generate_tests_for_file(file_path: str | Path, description: str,
 
     cfg = cfg or load_config()
     assert_not_windows_mount(cfg["_project_root"])
+    _p(0, "scaffolding subject")
     key = scaffold_subject(cfg, file_path, description)
     module_file = f"{_slug(file_path.stem)}.py"
 
@@ -117,6 +131,7 @@ def generate_tests_for_file(file_path: str | Path, description: str,
     from module1_mutation.mutant_normalizer import build_surviving_mutants
     OUTPUT_DIR.mkdir(exist_ok=True)
     mutants_path = OUTPUT_DIR / f"mutants_{key}.json"
+    _p(1, "injecting mutants and filtering survivors")
     mutants = build_surviving_mutants(cfg, key, client, mutants_path,
                                       skip_mutmut=not use_mutmut,
                                       skip_semantic=skip_semantic)
@@ -126,6 +141,7 @@ def generate_tests_for_file(file_path: str | Path, description: str,
     # 2. Context. Description chunk always leads; RAG adds retrieved chunks.
     retriever = None
     if use_rag and mutants:
+        _p(2, "indexing repository into ChromaDB")
         from agentic import knowledge_agent
         from module2_rag.retriever import Retriever
         knowledge_agent.run(cfg, key)
@@ -135,7 +151,8 @@ def generate_tests_for_file(file_path: str | Path, description: str,
     # 3. Generate + validate through the agentic loop; curate kills.
     from agentic.test_gen_agent import generate_and_validate
     records, kept = [], []
-    for m in mutants:
+    for i, m in enumerate(mutants):
+        _p(3, f"mutant {i + 1}/{len(mutants)}: {m['mutant_id']}")
         chunks = [_description_chunk(description, module_file)]
         if retriever is not None:
             chunks += retriever.retrieve(m, k)
@@ -147,6 +164,7 @@ def generate_tests_for_file(file_path: str | Path, description: str,
                          Path(rec["test_file"]).read_text(encoding="utf-8")))
 
     # 4. Output artifacts.
+    _p(4, "curating killed tests and packaging")
     OUTPUT_DIR.mkdir(exist_ok=True)
     out_tests = OUTPUT_DIR / f"test_{_slug(file_path.stem)}_generated.py"
     if kept:
