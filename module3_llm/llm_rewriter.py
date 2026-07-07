@@ -87,6 +87,9 @@ def rewrite_test(client, mutant: dict, existing_tests: str,
     user_prompt = build_prompt(mutant, existing_tests, context_chunks,
                                subject_subdir, feedback)
     condition = "RAG" if context_chunks else "NO_RAG"
+    # mutant_id in purpose enables per-mutant token attribution from the
+    # JSONL call log (RQ4 / UI cost views). metrics_logger's class regex
+    # still matches: it captures the third segment and ignores the rest.
     return client.generate_python(
         SYSTEM_PROMPT, user_prompt, temperature=client.temp_testgen,
-        purpose=f"testgen:{condition}:{mutant['mutation_class']}")
+        purpose=f"testgen:{condition}:{mutant['mutation_class']}:{mutant['mutant_id']}")

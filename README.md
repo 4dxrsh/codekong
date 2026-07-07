@@ -146,6 +146,21 @@ deterministic, no required file/network I/O in the functions under test. Also
 importable programmatically: `from generate_tests import
 generate_tests_for_file`.
 
+## Web UI
+
+    source venv/bin/activate
+    python -m frontend.app        # then open http://localhost:5001
+
+Five pages: Home (what mutation testing is, the pipeline, references),
+Research Questions (RQ1–RQ4 charts computed live from
+`module4_eval/results/` — explicit empty states when no runs exist, never
+placeholder numbers), Explore (every mutant: diff-highlighted code,
+collapsible AST with mutated nodes marked, test verdicts, the actual
+retrieved RAG chunks), Passed Tests (searchable table of all validated
+tests), and Generate (upload a .py file + description → background job →
+metrics → download the validated test file). Local single-user tool; jobs
+run in-process and take minutes because generation is a local LLM.
+
 ## Repository layout
 
     config.yaml               repo paths, k values, provider + model, caps

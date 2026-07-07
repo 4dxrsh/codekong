@@ -61,7 +61,17 @@ def generate_and_validate(cfg: dict, subject_key: str, mutant: dict,
               "condition": condition, "k": k, "subject": subject_key,
               "status": None, "attempts": 0, "retry_used": False,
               "valid_test_produced": False, "validation": [],
-              "wall_seconds": None, "test_file": None}
+              "wall_seconds": None, "test_file": None,
+              # Additive: retrieved-context provenance, so the RAG claim is
+              # inspectable per mutant (UI RAG panel) rather than asserted.
+              "context_chunks": [
+                  {"id": c.get("id"),
+                   "file": c.get("metadata", {}).get("file"),
+                   "qualname": c.get("metadata", {}).get("qualname"),
+                   "kind": c.get("metadata", {}).get("kind"),
+                   "distance": c.get("distance"),
+                   "snippet": (c.get("document") or "")[:400]}
+                  for c in (context_chunks or [])]}
     t0 = time.time()
     feedback = None
 
