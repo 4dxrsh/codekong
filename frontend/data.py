@@ -27,6 +27,10 @@ def load_corpus(cfg: dict | None = None) -> dict:
     cfg = cfg or load_config()
     results_dir = resolve(cfg, cfg["output"]["results_dir"])
     mutants = _read_json(resolve(cfg, cfg["output"]["surviving_mutants"])) or []
+    # User-upload mutant sets live in isolated per-upload files.
+    for p in sorted((Path(cfg["_project_root"]) / "generated_test_suites")
+                    .glob("mutants_*.json")):
+        mutants += _read_json(p) or []
 
     records = []
     for p in sorted(results_dir.glob("records_*.json")):

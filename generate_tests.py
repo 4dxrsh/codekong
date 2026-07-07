@@ -111,10 +111,12 @@ def generate_tests_for_file(file_path: str | Path, description: str,
         from module3_llm.ollama_client import OllamaClient
         client = OllamaClient(cfg)
 
-    # 1. Mutants (module1 via the mutation agent, writing the standard JSON).
-    from core.config import resolve
+    # 1. Mutants. Written to an ISOLATED per-upload file — never the shared
+    # module1_mutation/surviving_mutants.json, which belongs to the research
+    # experiment and must not be clobbered by ad-hoc user uploads.
     from module1_mutation.mutant_normalizer import build_surviving_mutants
-    mutants_path = resolve(cfg, cfg["output"]["surviving_mutants"])
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    mutants_path = OUTPUT_DIR / f"mutants_{key}.json"
     mutants = build_surviving_mutants(cfg, key, client, mutants_path,
                                       skip_mutmut=not use_mutmut,
                                       skip_semantic=skip_semantic)

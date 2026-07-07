@@ -17,7 +17,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from flask import (Flask, abort, jsonify, redirect, render_template_string,
+from flask import (Flask, abort, redirect, render_template_string,
                    request, send_file, url_for)
 
 from frontend import data as D
@@ -27,58 +27,97 @@ UPLOADS = PROJECT_ROOT / "frontend" / "uploads"
 JOBS: dict[str, dict] = {}
 _JOBS_LOCK = threading.Lock()
 
-BADGE = {"syntactic": "#7c6bd6", "sdl": "#2f9e8f", "semantic": "#d68a2f",
-         "higher_order": "#c2503f", "RAG": "#2f6bd6", "NO_RAG": "#8a8a8a"}
+# Apple-system accent palette, rendered as translucent chips.
+BADGE = {"syntactic": "#bf5af2", "sdl": "#64d2ff", "semantic": "#ffd60a",
+         "higher_order": "#ff453a", "RAG": "#2997ff", "NO_RAG": "#98989d"}
 
 BASE = """<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CodeKong — {{ title }}</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root { --accent:#2f6bd6; --ink:#1c2333; --muted:#66708a; --bg:#f7f8fb; }
-*{box-sizing:border-box} body{margin:0;font:16px/1.6 -apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:var(--bg)}
-nav{background:#fff;border-bottom:1px solid #e3e6ee;padding:0 32px;display:flex;gap:26px;align-items:center;height:58px;position:sticky;top:0;z-index:5}
-nav .brand{font-weight:700;color:var(--accent);font-size:19px;margin-right:12px}
-nav a{color:var(--ink);text-decoration:none;font-size:15px;padding:4px 2px;border-bottom:2px solid transparent}
-nav a.active,nav a:hover{border-bottom-color:var(--accent);color:var(--accent)}
-main{max-width:1080px;margin:0 auto;padding:36px 24px 80px}
-h1{font-size:30px;margin:.2em 0} h2{font-size:22px;margin-top:1.8em} h3{font-size:17px}
-.card{background:#fff;border:1px solid #e3e6ee;border-radius:10px;padding:22px 26px;margin:18px 0}
-.badge{display:inline-block;padding:1px 9px;border-radius:999px;color:#fff;font-size:12.5px;font-weight:600}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-table.data{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff}
-table.data th,table.data td{padding:8px 10px;border-bottom:1px solid #eceef4;text-align:left;vertical-align:top}
-table.data th{background:#f0f2f8;position:sticky;top:58px}
-tr.rowlink:hover{background:#f4f7ff;cursor:pointer}
-pre,code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-pre{background:#0f1420;color:#dde3f0;padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:13.5px;line-height:1.5}
-table.diff{width:100%;border-collapse:collapse;font-size:13px;background:#0f1420;color:#dde3f0;border-radius:8px;overflow:hidden}
-table.diff td{padding:1px 10px;white-space:pre;font-family:ui-monospace,Menlo,Consolas,monospace}
-table.diff td.ln{color:#5b6478;text-align:right;width:38px;user-select:none;border-right:1px solid #232a3d}
-tr.del td.code{background:#4a1f26;} tr.add td.code{background:#173d2a;}
-tr.del td.code::before{content:"- ";color:#e07a8a} tr.add td.code::before{content:"+ ";color:#5fce93}
-.pass{color:#177245;font-weight:700}.fail{color:#b3261e;font-weight:700}
-.pill-pass{background:#e3f4ea;color:#177245;padding:2px 10px;border-radius:999px;font-weight:600;font-size:13px}
-.pill-fail{background:#fbe9e7;color:#b3261e;padding:2px 10px;border-radius:999px;font-weight:600;font-size:13px}
-.muted{color:var(--muted)} .empty{padding:28px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #ccd2e0;border-radius:10px}
-.pipeline{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
-.stage{flex:1 1 140px;background:#fff;border:1.5px solid var(--accent);border-radius:9px;padding:10px 12px;font-size:13.5px;position:relative}
-.stage b{display:block;color:var(--accent)} .arrow{align-self:center;color:var(--accent);font-size:20px}
-details.ast{margin-left:16px;font-size:13.5px} details.ast>summary{cursor:pointer;padding:1px 4px;border-radius:4px}
-details.ast>summary.marked{background:#ffe4b8;font-weight:700} details.ast>summary:hover{background:#eef2fc}
-input[type=text],textarea,select{width:100%;padding:9px 11px;border:1px solid #ccd2e0;border-radius:7px;font-size:15px}
-button,.btn{background:var(--accent);color:#fff;border:0;border-radius:7px;padding:10px 20px;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
-.refs li{margin-bottom:10px;font-size:14.5px} .refs .why{color:var(--muted)}
-.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
-.stat{background:#fff;border:1px solid #e3e6ee;border-radius:10px;padding:14px;text-align:center}
-.stat .v{font-size:26px;font-weight:700;color:var(--accent)}
+:root{--bg:#0b0b0f;--panel:#151519;--line:#26262c;--ink:#f5f5f7;--muted:#86868b;
+--accent:#2997ff;--green:#30d158;--red:#ff453a;--radius:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:15px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:10;display:flex;gap:28px;align-items:center;
+height:52px;padding:0 max(24px,calc(50vw - 540px));
+background:rgba(11,11,15,.72);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+nav .brand{font-weight:700;font-size:16px;letter-spacing:-.02em;color:var(--ink)}
+nav a{color:var(--muted);text-decoration:none;font-size:13.5px;transition:color .15s}
+nav a:hover{color:var(--ink)} nav a.active{color:var(--ink)}
+main{max-width:1080px;margin:0 auto;padding:48px 24px 110px}
+h1{font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin:.1em 0 .4em}
+h2{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-top:2.2em}
+h3{font-weight:600;color:var(--muted);text-transform:uppercase;
+letter-spacing:.06em;font-size:12.5px}
+p{color:#d5d5da} .muted{color:var(--muted)}
+.lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:46em;font-weight:400}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+padding:24px 28px;margin:18px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.grid2{grid-template-columns:1fr}}
+.chip{display:inline-block;padding:2px 11px;border-radius:980px;font-size:12px;font-weight:600}
+table.data{width:100%;border-collapse:collapse;font-size:13.5px}
+table.data th{color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;
+letter-spacing:.05em;text-align:left;padding:10px;border-bottom:1px solid var(--line)}
+table.data td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.rowlink{cursor:pointer;transition:background .12s} tr.rowlink:hover{background:#1b1b21}
+pre,code,.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace}
+code{background:#1e1e24;padding:1px 6px;border-radius:6px;font-size:13px}
+pre{background:#101014;border:1px solid var(--line);color:#e8e8ed;padding:16px 18px;
+border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
+table.diff{width:100%;border-collapse:collapse;font-size:12.5px;background:#101014;
+border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+table.diff td{padding:1.5px 10px;white-space:pre;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+table.diff td.ln{color:#48484f;text-align:right;width:36px;user-select:none}
+tr.del td.code{background:rgba(255,69,58,.14)} tr.add td.code{background:rgba(48,209,88,.12)}
+tr.del td.code::before{content:"− ";color:var(--red)} tr.add td.code::before{content:"+ ";color:var(--green)}
+.pass{color:var(--green);font-weight:600}.fail{color:var(--red);font-weight:600}
+.pill-pass{background:rgba(48,209,88,.15);color:var(--green);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
+.pill-fail{background:rgba(255,69,58,.15);color:var(--red);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
+.empty{padding:34px;text-align:center;color:var(--muted);background:var(--panel);
+border:1px dashed var(--line);border-radius:var(--radius)}
+.pipeline{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
+.stage{flex:1 1 150px;background:#101014;border:1px solid var(--line);border-radius:12px;
+padding:12px 14px;font-size:12.5px;color:var(--muted)}
+.stage b{display:block;color:var(--ink);font-size:13px;margin-bottom:3px}
+.arrow{align-self:center;color:var(--muted)}
+details.ast{margin-left:15px;font-size:13px}
+details.ast>summary{cursor:pointer;padding:1px 6px;border-radius:6px;color:#c8c8cf;list-style:none}
+details.ast>summary::before{content:"▸ ";color:var(--muted);font-size:10px}
+details[open].ast>summary::before{content:"▾ "}
+details.ast>summary.marked{background:rgba(255,214,10,.16);color:#ffd60a;font-weight:600}
+details.ast>summary:hover{background:#1b1b21}
+input[type=text],textarea,select{width:100%;padding:10px 13px;border:1px solid var(--line);
+border-radius:10px;font-size:14px;background:#101014;color:var(--ink);outline:none}
+input:focus,textarea:focus{border-color:var(--accent)}
+select{width:auto}
+button,.btn{background:var(--accent);color:#fff;border:0;border-radius:980px;
+padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;
+display:inline-block;transition:opacity .15s}
+button:hover,.btn:hover{opacity:.85}
+.refs li{margin-bottom:11px;font-size:13.5px;color:#d5d5da} .refs .why{color:var(--muted)}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+padding:16px;text-align:center}
+.stat .v{font-size:27px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.stat .l{font-size:12px;color:var(--muted)}
+a{color:var(--accent);text-decoration:none}
+label{color:#d5d5da;font-size:14px}
 </style></head><body>
 <nav><span class="brand">CodeKong</span>
 <a href="/" class="{{ 'active' if page=='home' }}">Home</a>
 <a href="/research-questions" class="{{ 'active' if page=='rq' }}">Research Questions</a>
-<a href="/explore" class="{{ 'active' if page=='explore' }}">Explore Dataset</a>
+<a href="/explore" class="{{ 'active' if page=='explore' }}">Explore</a>
 <a href="/passed-tests" class="{{ 'active' if page=='passed' }}">Passed Tests</a>
-<a href="/generate" class="{{ 'active' if page=='generate' }}">Generate Tests</a>
-</nav><main>{{ body }}</main></body></html>"""
+<a href="/generate" class="{{ 'active' if page=='generate' }}">Generate</a>
+</nav><main>{{ body|safe }}</main>
+<script>if (window.Chart){Chart.defaults.color='#86868b';
+Chart.defaults.borderColor='#26262c';Chart.defaults.font.family='-apple-system,Segoe UI,Roboto,sans-serif';}</script>
+</body></html>"""
 
 
 def page(title, pg, body, **ctx):
@@ -87,8 +126,15 @@ def page(title, pg, body, **ctx):
 
 
 def badge(kind: str) -> str:
-    color = BADGE.get(kind, "#66708a")
-    return f'<span class="badge" style="background:{color}">{kind}</span>'
+    c = BADGE.get(kind, "#98989d")
+    return (f'<span class="chip" style="background:{_rgba(c, .16)};'
+            f'color:{c}">{kind}</span>')
+
+
+def _rgba(hex_color: str, a: float) -> str:
+    h = hex_color.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{a})"
 
 
 app.jinja_env.globals.update(badge=badge)
@@ -96,45 +142,44 @@ app.jinja_env.globals.update(badge=badge)
 
 # ------------------------------------------------------------------- Home
 HOME = """
-<h1>CodeKong</h1>
-<p style="font-size:18px">RAG-conditioned test regeneration targeting <b>surviving mutants</b>:
-does showing an LLM the actual codebase under test help it write tests that kill bugs the
-existing suite misses — and does that help grow as the bugs get harder?</p>
+<h1>Tests that hunt the bugs<br>your suite already missed.</h1>
+<p class="lede">CodeKong plants four escalating classes of artificial bugs in real code,
+keeps the ones the existing tests fail to catch, and measures whether showing an LLM the
+actual codebase (RAG) helps it write tests that kill them.</p>
 
 <h2>What is mutation testing?</h2>
 <div class="card">
-<p>Mutation testing plants small artificial bugs ("mutants") in working code and checks whether
-the test suite notices. Every mutant the suite fails to catch is a measured blind spot.</p>
+<p>Mutation testing plants small artificial bugs ("mutants") in working code and checks
+whether the test suite notices. Every mutant the suite fails to catch is a measured blind spot.</p>
 <div class="grid2">
 <pre># Original
 def is_valid_password(pw):
     return len(pw) &gt;= 8</pre>
 <pre># Mutant (&gt;= becomes &gt;)
 def is_valid_password(pw):
-    return len(pw) <span style="background:#4a1f26;padding:0 4px">&gt;</span> 8</pre>
+    return len(pw) <span style="background:rgba(255,69,58,.25);border-radius:4px;padding:0 5px">&gt;</span> 8</pre>
 </div>
-<p><i>If the test suite never checks a password of exactly length 8, this mutant survives —
-and that survival is exactly the blind spot mutation testing exists to find.</i></p>
+<p class="muted"><i>If the test suite never checks a password of exactly length 8, this
+mutant survives — and that survival is exactly the blind spot mutation testing exists to find.</i></p>
 <table class="data"><tr><th>Class</th><th>What it does</th></tr>
-<tr><td>{{ badge('sdl')|safe }} Statement deletion</td><td>Removes a statement outright (Python <code>ast</code>)</td></tr>
-<tr><td>{{ badge('syntactic')|safe }} Syntax mutation</td><td>Swaps an operator or constant (<code>&gt;=</code>→<code>&gt;</code>), via mutmut</td></tr>
-<tr><td>{{ badge('semantic')|safe }} LLM semantic mutation</td><td>An LLM injects a realistic, natural-looking bug rather than a fixed rule</td></tr>
-<tr><td>{{ badge('higher_order')|safe }} Higher-order mutation</td><td>Combines two first-order mutants in one function (Jia &amp; Harman), simulating interacting faults</td></tr>
+<tr><td>{{ badge('sdl')|safe }}</td><td>Removes a statement outright (Python <code>ast</code>)</td></tr>
+<tr><td>{{ badge('syntactic')|safe }}</td><td>Swaps an operator or constant (<code>&gt;=</code> → <code>&gt;</code>), via mutmut</td></tr>
+<tr><td>{{ badge('semantic')|safe }}</td><td>An LLM injects a realistic, natural-looking bug rather than a fixed rule</td></tr>
+<tr><td>{{ badge('higher_order')|safe }}</td><td>Combines two first-order mutants in one function (Jia &amp; Harman), simulating interacting faults</td></tr>
 </table></div>
 
-<h2>The CodeKong pipeline</h2>
+<h2>The pipeline</h2>
 <div class="card"><div class="pipeline">
-<div class="stage"><b>1. Ingest</b>Parse the subject repo's functions via AST</div><div class="arrow">→</div>
-<div class="stage"><b>2. Index</b>Embed function/docstring/test chunks into a local ChromaDB</div><div class="arrow">→</div>
-<div class="stage"><b>3. Mutate</b>Four strategies generate candidate mutants</div><div class="arrow">→</div>
-<div class="stage"><b>4. Filter</b>Run the existing suite; keep only <b>survivors</b></div><div class="arrow">→</div>
-<div class="stage"><b>5. Generate</b>Top-K RAG chunks + diff + class-aware prompt → Ollama LLM → candidate test (one validator-guided retry)</div><div class="arrow">→</div>
-<div class="stage"><b>6. Validate & log</b>Pass-on-original AND fail-on-mutant = kill; tokens, K, chunks logged per mutant</div>
+<div class="stage"><b>1 · Ingest</b>Parse the subject repo's functions via AST</div><div class="arrow">→</div>
+<div class="stage"><b>2 · Index</b>Embed function, docstring and test chunks into local ChromaDB</div><div class="arrow">→</div>
+<div class="stage"><b>3 · Mutate</b>Four strategies generate candidate mutants</div><div class="arrow">→</div>
+<div class="stage"><b>4 · Filter</b>Run the existing suite; keep only survivors</div><div class="arrow">→</div>
+<div class="stage"><b>5 · Generate</b>Top-K chunks + diff + class-aware prompt → local LLM, one validator-guided retry</div><div class="arrow">→</div>
+<div class="stage"><b>6 · Validate</b>Pass on original AND fail on mutant = kill; tokens, K, chunks logged</div>
 </div>
-<p class="muted">The research is in the ablations: the same generation step runs closed-book
-(NO_RAG, MuTAP-style) and with retrieved codebase context (RAG) at K = 3/5/8, per mutation
-class — so the site can answer whether context helps, where it helps most, how much context
-is right, and what a kill costs.</p></div>
+<p class="muted">The research lives in the ablations: identical generation runs closed-book
+(NO_RAG, MuTAP-style) and with retrieved context (RAG) at K = 3/5/8, per mutation class —
+answering whether context helps, where it helps most, how much is right, and what a kill costs.</p></div>
 
 <h2>References</h2>
 <div class="card"><ul class="refs">
@@ -147,7 +192,7 @@ is right, and what a kill costs.</p></div>
 <li>Chang et al., <i>AdverTest</i>, 2026. <span class="why">— adversarial co-evolution of tests and mutants; CodeKong fixes the mutation strategies and isolates what RAG context does.</span></li>
 <li><i>LLMs for Unit Testing: A Systematic Literature Review</i>, 2025. <span class="why">— survey situating RAG-for-testing.</span></li>
 </ul></div>
-<p style="text-align:center;margin-top:30px"><a class="btn" href="/research-questions">See the research questions answered →</a></p>
+<p style="text-align:center;margin-top:38px"><a class="btn" href="/research-questions">See the research questions answered</a></p>
 """
 
 
@@ -161,20 +206,17 @@ RQ = """
 <h1>Research Questions</h1>
 {% if not have_data %}<div class="empty">No pipeline results found yet under
 <code>module4_eval/results/</code>. Run <code>python run_pipeline.py --repo sorts</code>
-(or a <code>--limit</code> smoke run) and reload — this page computes everything from the
-real CSVs and never shows placeholder numbers.</div>{% endif %}
+(or a <code>--limit</code> smoke run) and reload — this page computes everything from
+the real CSVs and never shows placeholder numbers.</div>{% endif %}
 
 {% if d.rq1 %}<h2>RQ1 — Does RAG beat closed-book generation?</h2>
-<div class="card"><canvas id="c1" height="110"></canvas>
-<p>{{ rq1_take }}</p></div>{% endif %}
+<div class="card"><canvas id="c1" height="100"></canvas><p>{{ rq1_take }}</p></div>{% endif %}
 
-{% if d.rq2 %}<h2>RQ2 — Does the benefit vary by mutation class (hardness gradient)?</h2>
-<div class="card"><canvas id="c2" height="120"></canvas>
-<p>{{ rq2_take }}</p></div>{% endif %}
+{% if d.rq2 %}<h2>RQ2 — Does the benefit vary by mutation class?</h2>
+<div class="card"><canvas id="c2" height="110"></canvas><p>{{ rq2_take }}</p></div>{% endif %}
 
-{% if d.rq3 %}<h2>RQ3 — How much retrieved context is the right amount?</h2>
-<div class="card"><canvas id="c3" height="110"></canvas>
-<p>{{ rq3_take }}</p></div>{% endif %}
+{% if d.rq3 %}<h2>RQ3 — How much retrieved context is right?</h2>
+<div class="card"><canvas id="c3" height="100"></canvas><p>{{ rq3_take }}</p></div>{% endif %}
 
 {% if d.rq4 and d.rq4.rows %}<h2>RQ4 — Is the cost worth it, per bug type?</h2>
 <div class="card"><table class="data"><tr><th>Condition</th><th>Class</th>
@@ -187,18 +229,21 @@ a local model has no bill, so tokens are the cost-equivalent unit.</p></div>{% e
 
 <script>
 const D = {{ d | tojson }};
-if (D.rq1 && Object.keys(D.rq1).length) new Chart(c1, {type:'bar', data:{
-  labels:Object.keys(D.rq1), datasets:[{label:'kill rate',
-  data:Object.values(D.rq1).map(x=>x.kill_rate), backgroundColor:['#8a8a8a','#2f6bd6']}]},
-  options:{scales:{y:{min:0,max:1}},plugins:{legend:{display:false}}}});
-if (D.rq2 && D.rq2.classes) new Chart(c2, {type:'bar', data:{labels:D.rq2.classes, datasets:[
-  {label:'NO_RAG', data:D.rq2.norag, backgroundColor:'#8a8a8a'},
-  {label:'RAG', data:D.rq2.rag, backgroundColor:'#2f6bd6'}]},
-  options:{scales:{y:{min:0,max:1,title:{display:true,text:'kill rate'}}}}});
-if (D.rq3 && D.rq3.k) new Chart(c3, {type:'line', data:{labels:D.rq3.k, datasets:[
-  {label:'kill rate', data:D.rq3.kill_rate, borderColor:'#2f6bd6'},
-  {label:'valid test rate', data:D.rq3.valid_test_rate, borderColor:'#2f9e8f'}]},
-  options:{scales:{y:{min:0,max:1},x:{title:{display:true,text:'retrieval depth K'}}}}});
+if (D.rq1 && Object.keys(D.rq1).length) new Chart(document.getElementById('c1'), {type:'bar',
+ data:{labels:Object.keys(D.rq1), datasets:[{label:'kill rate',
+ data:Object.values(D.rq1).map(x=>x.kill_rate),
+ backgroundColor:['#98989d','#2997ff'], borderRadius:8}]},
+ options:{scales:{y:{min:0,max:1}},plugins:{legend:{display:false}}}});
+if (D.rq2 && D.rq2.classes) new Chart(document.getElementById('c2'), {type:'bar',
+ data:{labels:D.rq2.classes, datasets:[
+ {label:'NO_RAG', data:D.rq2.norag, backgroundColor:'#98989d', borderRadius:8},
+ {label:'RAG', data:D.rq2.rag, backgroundColor:'#2997ff', borderRadius:8}]},
+ options:{scales:{y:{min:0,max:1,title:{display:true,text:'kill rate'}}}}});
+if (D.rq3 && D.rq3.k) new Chart(document.getElementById('c3'), {type:'line',
+ data:{labels:D.rq3.k, datasets:[
+ {label:'kill rate', data:D.rq3.kill_rate, borderColor:'#2997ff', tension:.3},
+ {label:'valid test rate', data:D.rq3.valid_test_rate, borderColor:'#30d158', tension:.3}]},
+ options:{scales:{y:{min:0,max:1},x:{title:{display:true,text:'retrieval depth K'}}}}});
 </script>
 """
 
@@ -249,12 +294,12 @@ def rqs():
 
 # ----------------------------------------------------------------- Explore
 EXPLORE = """
-<h1>Explore Dataset</h1>
+<h1>Explore</h1>
 <p class="muted">Every mutant in the current corpus. Subjects are the real configured
-repos (sorts, schedule, and any user-uploaded files) — this deployment has not processed
-BugsInPy/HumanEval/MBPP and will not pretend to.</p>
+repos (sorts, schedule, and user-uploaded files) — this deployment has not processed
+BugsInPy/HumanEval/MBPP and will not pretend it has.</p>
 {% if not rows %}<div class="empty">No mutants yet — run the mutate phase first.</div>{% else %}
-<div class="card" style="padding:12px 16px">Filter:
+<div class="card" style="padding:14px 18px">
 <select id="fsub" onchange="filt()"><option value="">all subjects</option>
 {% for s in subjects %}<option>{{ s }}</option>{% endfor %}</select>
 <select id="fcls" onchange="filt()" style="margin-left:8px"><option value="">all classes</option>
@@ -290,31 +335,31 @@ def explore():
 
 
 DETAIL = """
-<p><a href="/explore">← back to Explore</a></p>
-<h1 class="mono" style="font-size:22px">{{ mid }}</h1>
+<p><a href="/explore">← Explore</a></p>
+<h1 class="mono" style="font-size:21px">{{ mid }}</h1>
 {% if m %}
-<p>{{ badge(m.mutation_class)|safe }} in <code>{{ m.file }}</code> ·
-<code>{{ m.function }}</code> (line {{ m.line }}) — {{ m.mutation_description }}</p>
+<p>{{ badge(m.mutation_class)|safe }} &nbsp;<code>{{ m.file }}</code> ·
+<code>{{ m.function }}</code> (line {{ m.line }}) — <span class="muted">{{ m.mutation_description }}</span></p>
 <div class="grid2">
-<div><h3>Source with mutation (diff view)</h3>
+<div><h3>Source with mutation</h3>
 <table class="diff">{% for r in diff %}
 <tr class="{{ r.tag }}"><td class="ln">{{ r.a or '' }}</td><td class="ln">{{ r.b or '' }}</td>
 <td class="code">{{ r.text }}</td></tr>{% endfor %}</table>
 {% if m.mutation_class == 'higher_order' %}<p class="muted">Higher-order mutant:
 every changed region above is highlighted, not just one.</p>{% endif %}</div>
-<div><h3>AST (original function; mutated nodes marked)</h3>
-<div class="card" style="max-height:480px;overflow:auto">{{ ast_html|safe }}</div></div>
+<div><h3>AST — mutated nodes marked</h3>
+<div class="card" style="max-height:480px;overflow:auto;padding:14px">{{ ast_html|safe }}</div></div>
 </div>
-{% else %}<div class="empty">This mutant is not in the current surviving_mutants.json
-(results from an earlier mutant set) — showing its run records only.</div>{% endif %}
+{% else %}<div class="empty">This mutant is not in the current mutant set
+(results from an earlier run) — showing its run records only.</div>{% endif %}
 
 <h2>Test attempts</h2>
 {% if not tests %}<div class="empty">No generation runs for this mutant yet.</div>{% endif %}
 {% for t in tests %}
 <div class="card"><b>{{ badge(t.condition)|safe }}{% if t.k %} k={{ t.k }}{% endif %}
-attempt {{ t.attempt }}</b> · <span class="{{ 'pass' if t.passed else 'fail' }}">
-{{ 'KILL (passed on original, failed on mutant)' if t.passed else 'NO KILL' }}</span>
-<span class="badge" style="background:#66708a">generated</span>
+&nbsp;attempt {{ t.attempt }}</b> · <span class="{{ 'pass' if t.passed else 'fail' }}">
+{{ 'KILL — passed on original, failed on mutant' if t.passed else 'NO KILL' }}</span>
+{{ badge('generated' if t.origin == 'generated' else t.origin)|safe }}
 <p class="muted">{{ t.reason }}</p>
 {% if t.code %}<pre>{{ t.code }}</pre>{% endif %}</div>
 {% endfor %}
@@ -323,7 +368,7 @@ attempt {{ t.attempt }}</b> · <span class="{{ 'pass' if t.passed else 'fail' }}
 {% if not chunks %}<div class="empty">No retrieved-context provenance for this mutant
 (NO_RAG runs, or records predating chunk logging).</div>{% endif %}
 {% for c in chunks %}<div class="card"><b class="mono">{{ c.file }} · {{ c.qualname }}</b>
-<span class="badge" style="background:#2f9e8f">{{ c.kind }}</span>
+&nbsp;{{ badge(c.kind or 'chunk')|safe }}
 {% if c.distance is not none %}<span class="muted"> distance {{ '%.3f' % c.distance }}</span>{% endif %}
 <pre>{{ c.snippet }}</pre></div>{% endfor %}
 """
@@ -359,12 +404,12 @@ def detail(mutant_id):
 PASSED = """
 <h1>Passed Tests</h1>
 <p class="muted">Every generated test that passed on the original code (valid tests),
-across the whole corpus. "KILLED" additionally means it failed on its mutant — the
-full kill criterion. The subjects' original suites gate mutant survival upstream and
-are not itemized here (doctest-based suites don't decompose into named cases).</p>
+across the whole corpus. KILLED additionally means it failed on its mutant — the full
+kill criterion. Subjects' original suites gate mutant survival upstream and are not
+itemized here (doctest-based suites don't decompose into named cases).</p>
 {% if not rows %}<div class="empty">No validated tests yet.</div>{% else %}
-<input type="text" id="q" placeholder="search mutant / subject / class…"
- onkeyup="f()" style="margin-bottom:12px">
+<input type="text" id="q" placeholder="Search mutant, subject, class…"
+ onkeyup="f()" style="margin-bottom:14px">
 <table class="data" id="tbl"><tr><th>Mutant</th><th>Subject</th><th>Class</th>
 <th>Condition</th><th>Killed?</th><th>Test snippet</th></tr>
 {% for r in rows %}<tr>
@@ -373,7 +418,7 @@ are not itemized here (doctest-based suites don't decompose into named cases).</
 <td>{{ badge(r.condition)|safe }}{% if r.k %} k={{ r.k }}{% endif %}</td>
 <td>{% if r.killed %}<span class="pill-pass">KILLED</span>
 {% else %}<span class="pill-fail">valid, no kill</span>{% endif %}</td>
-<td><pre style="max-width:420px;max-height:150px;overflow:auto">{{ r.snippet }}</pre></td>
+<td><pre style="max-width:420px;max-height:150px;overflow:auto;margin:0">{{ r.snippet }}</pre></td>
 </tr>{% endfor %}</table>
 <script>function f(){const q=document.getElementById('q').value.toLowerCase();
 document.querySelectorAll('#tbl tr').forEach((r,i)=>{if(!i)return;
@@ -391,20 +436,22 @@ def passed():
 
 # --------------------------------------------------- Generate (user flow)
 GENERATE = """
-<h1>Generate tests for your code</h1>
-<p>Upload one Python file and describe what it does. CodeKong injects bugs, keeps the
-ones a bootstrap suite misses, and returns only tests that provably pass on your code
-and fail on a specific bug. <b>This runs a local LLM: expect minutes, not seconds.</b></p>
+<h1>Generate tests for your code.</h1>
+<p class="lede">Upload one Python file, describe what it does, and get back only tests
+that provably pass on your code and fail on a specific injected bug.</p>
 <div class="card"><form method="post" enctype="multipart/form-data">
-<p><label>Python file (.py)<br><input type="file" name="pyfile" accept=".py" required></label></p>
-<p><label>What does this code do? (context given to the model)<br>
-<textarea name="description" rows="3" required
+<p><label>Python file (.py)<br><input type="file" name="pyfile" accept=".py" required
+ style="margin-top:6px;color:#d5d5da"></label></p>
+<p><label>What does this code do? <span class="muted">(context given to the model)</span><br>
+<textarea name="description" rows="3" required style="margin-top:6px"
  placeholder="e.g. Utility functions for clamping and interpolating numeric ranges"></textarea></label></p>
-<p style="display:flex;gap:22px;align-items:center">
-<label>Mutant cap <input type="text" name="limit" value="15" style="width:70px"></label>
+<p style="display:flex;gap:26px;align-items:center;flex-wrap:wrap">
+<label>Mutant cap <input type="text" name="limit" value="15" style="width:64px;margin-left:6px"></label>
 <label><input type="checkbox" name="skip_semantic" checked> skip LLM-generated mutants (faster)</label>
 <label><input type="checkbox" name="use_rag" checked> use RAG retrieval</label></p>
-<button type="submit">Start generation</button></form></div>
+<button type="submit">Start generation</button>
+<p class="muted" style="margin-top:10px">Runs a local LLM — expect minutes, not seconds.
+Constraints: pure Python, deterministic, no required file/network I/O.</p></form></div>
 {% if jobs %}<h2>Recent jobs</h2><table class="data">
 <tr><th>Job</th><th>File</th><th>Status</th><th></th></tr>
 {% for j in jobs %}<tr><td class="mono">{{ j.id[:8] }}</td><td>{{ j.filename }}</td>
@@ -413,21 +460,20 @@ and fail on a specific bug. <b>This runs a local LLM: expect minutes, not second
 """
 
 JOB = """
-<p><a href="/generate">← back</a></p>
-<h1>Job {{ j.id[:8] }} — {{ j.filename }}</h1>
-<div id="live">
+<p><a href="/generate">← Generate</a></p>
+<h1 style="font-size:26px">{{ j.filename }} <span class="muted mono" style="font-size:15px">{{ j.id[:8] }}</span></h1>
 {% if j.status == 'running' %}<div class="empty">Running… started {{ j.age }}s ago.
-This page auto-refreshes every 5 s. Local model generation takes minutes per mutant.</div>
+This page refreshes every 5 seconds. Local generation takes minutes per mutant.</div>
 <script>setTimeout(()=>location.reload(), 5000)</script>
 {% elif j.status == 'error' %}<div class="card"><span class="fail">FAILED</span>
 <pre>{{ j.error }}</pre></div>
 {% else %}
 <div class="statgrid">
-<div class="stat"><div class="v">{{ j.report.mutants_attempted }}</div>mutants attempted</div>
-<div class="stat"><div class="v">{{ j.report.mutants_killed }}</div>killed → tests kept</div>
-<div class="stat"><div class="v">{{ '%.0f%%' % (100*j.report.kill_rate) if j.report.kill_rate is not none else '—' }}</div>kill rate</div>
-<div class="stat"><div class="v">{{ '%.0f' % j.report.wall_seconds }}s</div>wall time</div>
-<div class="stat"><div class="v">{{ j.report.model }}</div>model</div></div>
+<div class="stat"><div class="v">{{ j.report.mutants_attempted }}</div><div class="l">mutants attempted</div></div>
+<div class="stat"><div class="v">{{ j.report.mutants_killed }}</div><div class="l">killed → tests kept</div></div>
+<div class="stat"><div class="v">{{ '%.0f%%' % (100*j.report.kill_rate) if j.report.kill_rate is not none else '—' }}</div><div class="l">kill rate</div></div>
+<div class="stat"><div class="v">{{ '%.0f' % j.report.wall_seconds }}s</div><div class="l">wall time</div></div>
+<div class="stat"><div class="v" style="font-size:16px">{{ j.report.model }}</div><div class="l">model</div></div></div>
 <div class="card"><h3>Outcome breakdown</h3><table class="data">
 <tr><th>Status</th><th>Count</th><th>Meaning</th></tr>
 {% for s, n in j.report.statuses.items() %}<tr><td>{{ s }}</td><td>{{ n }}</td>
@@ -436,13 +482,13 @@ This page auto-refreshes every 5 s. Local model generation takes minutes per mut
 'INVALID_TEST':'no generated test passed on your original code',
 'GEN_FAILED':'model produced no valid Python'}.get(s, '') }}</td></tr>{% endfor %}</table></div>
 {% if j.report.output_test_file %}
-<p><a class="btn" href="/generate/job/{{ j.id }}/download">Download your test file</a>
-<span class="muted" style="margin-left:12px">drops straight into your project; run with pytest</span></p>
-<div class="card"><pre>{{ j.preview }}</pre></div>
+<p><a class="btn" href="/generate/job/{{ j.id }}/download">Download test file</a>
+<span class="muted" style="margin-left:14px">drops straight into your project; run with pytest</span></p>
+<div class="card"><pre>{{ preview }}</pre></div>
 {% else %}<div class="empty">No mutants were killed, so no test file was kept. Likely causes:
-the model tier is too weak, the code needs file/network I/O, or the mutants were equivalent.
+model tier too weak, code needs file/network I/O, or the mutants were equivalent.
 The per-mutant records in the report JSON say which.</div>{% endif %}
-{% endif %}</div>
+{% endif %}
 """
 
 
