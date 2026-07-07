@@ -51,7 +51,8 @@ if [ "$OS" = "Darwin" ]; then
   PY=$(command -v python3.11 || command -v python3)
 else
   sudo apt-get update -y
-  sudo apt-get install -y python3-venv python3-pip git curl
+  # zstd: required by Ollama's Linux install script for archive extraction
+  sudo apt-get install -y python3-venv python3-pip git curl zstd
   PY=python3
 fi
 [ -d venv ] || "$PY" -m venv venv
