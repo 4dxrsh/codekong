@@ -20,7 +20,7 @@ Ties into the existing architecture rather than duplicating it:
   curation      -> only KILLED tests are merged into the output file; each is
                    provably a real regression test, not plausible-looking noise
 
-Programmatic use (future frontend: call this, poll the returned report):
+Programmatic use (frontend: call this, poll the returned report):
     from generate_tests import generate_tests_for_file
     report = generate_tests_for_file("mymodule.py", "what it does", limit=15)
 """
@@ -96,17 +96,30 @@ def generate_tests_for_file(file_path: str | Path, description: str,
                             use_mutmut: bool = False, use_rag: bool = True,
                             skip_semantic: bool = False,
                             cfg: dict | None = None, client=None,
-                            progress=None) -> dict:
+                            progress=None, on_event=None) -> dict:
     """Full pipeline for one user file. Returns a JSON-serializable report.
 
     progress: optional callable(stage:int, detail:str) — purely additive UI
     hook (stages 0..4: scaffold, mutate+filter, index, generate+validate,
     package). Never affects pipeline behavior; failures in it are swallowed.
+
+    on_event: optional callable(kind:str, payload:dict) — additive rich event
+    stream carrying the REAL artifacts of each step (functions found, mutant
+    diffs, retrieved chunks, validation verdicts) so a UI can show the whole
+    process transparently. Same guarantees: no behavior change, failures
+    swallowed. Kinds: scaffold, mutants, indexed, retrieve, result, done.
     """
     def _p(stage: int, detail: str = ""):
         if progress is not None:
             try:
                 progress(stage, detail)
+            except Exception:
+                pass
+
+    def _e(kind: str, **payload):
+        if on_event is not None:
+            try:
+                on_event(kind, payload)
             except Exception:
                 pass
 
@@ -120,6 +133,12 @@ def generate_tests_for_file(file_path: str | Path, description: str,
     _p(0, "scaffolding subject")
     key = scaffold_subject(cfg, file_path, description)
     module_file = f"{_slug(file_path.stem)}.py"
+    from core.srcmap import extract_functions
+    subj_dir = Path(cfg["_project_root"]) / cfg["subjects"][key]["path"]
+    _e("scaffold", module=module_file, description=description,
+       functions=[{"name": fi.qualname, "lines": fi.end_lineno - fi.lineno + 1,
+                   "source": fi.source[:600]}
+                  for fi in extract_functions(subj_dir) if not fi.is_test])
 
     if client is None:
         from module3_llm.ollama_client import OllamaClient
@@ -137,6 +156,10 @@ def generate_tests_for_file(file_path: str | Path, description: str,
                                       skip_semantic=skip_semantic)
     if limit:
         mutants = mutants[:limit]
+    _e("mutants", mutants=[{"id": m["mutant_id"],
+                            "mutation_class": m["mutation_class"],
+                            "description": m["mutation_description"][:300],
+                            "diff": m["diff"][:1500]} for m in mutants])
 
     # 2. Context. Description chunk always leads; RAG adds retrieved chunks.
     retriever = None
@@ -144,7 +167,12 @@ def generate_tests_for_file(file_path: str | Path, description: str,
         _p(2, "indexing repository into ChromaDB")
         from agentic import knowledge_agent
         from module2_rag.retriever import Retriever
-        knowledge_agent.run(cfg, key)
+        import json as _json
+        manifest_path = knowledge_agent.run(cfg, key)
+        n_chunks = _json.loads(manifest_path.read_text(
+            encoding="utf-8")).get(key, {}).get("chunks")
+        _e("indexed", chunks=n_chunks,
+           embedding_model=cfg["rag"]["embedding_model"])
         retriever = Retriever(cfg, key)
     k = k or cfg["rag"]["default_k"]
 
@@ -156,12 +184,27 @@ def generate_tests_for_file(file_path: str | Path, description: str,
         chunks = [_description_chunk(description, module_file)]
         if retriever is not None:
             chunks += retriever.retrieve(m, k)
+        _e("retrieve", mutant_id=m["mutant_id"], k=k,
+           chunks=[{"file": c.get("metadata", {}).get("file"),
+                    "qualname": c.get("metadata", {}).get("qualname"),
+                    "kind": c.get("metadata", {}).get("kind"),
+                    "distance": c.get("distance"),
+                    "snippet": (c.get("document") or "")[:300]}
+                   for c in chunks])
         rec = generate_and_validate(cfg, key, m, chunks, "RAG", client, k=k)
         records.append(rec)
         print(f"[usercode] {m['mutant_id']}: {rec['status']}")
+        test_code = None
         if rec["status"] == "KILLED" and rec.get("test_file"):
-            kept.append((m["mutant_id"],
-                         Path(rec["test_file"]).read_text(encoding="utf-8")))
+            test_code = Path(rec["test_file"]).read_text(encoding="utf-8")
+            kept.append((m["mutant_id"], test_code))
+        _e("result", mutant_id=m["mutant_id"], status=rec["status"],
+           attempts=rec["attempts"], retry_used=rec["retry_used"],
+           validations=[{"attempt": v.get("attempt"), "status": v.get("status"),
+                         "stage": v.get("stage"),
+                         "reason": (v.get("reason") or "")[:300]}
+                        for v in rec.get("validation", [])],
+           test_code=(test_code or "")[:1500] or None)
 
     # 4. Output artifacts.
     _p(4, "curating killed tests and packaging")
@@ -183,6 +226,11 @@ def generate_tests_for_file(file_path: str | Path, description: str,
     }
     report_path = OUTPUT_DIR / f"report_{_slug(file_path.stem)}.json"
     report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    _e("done", mutants_attempted=report["mutants_attempted"],
+       mutants_killed=report["mutants_killed"],
+       kill_rate=report["kill_rate"], wall_seconds=report["wall_seconds"],
+       statuses=report["statuses"],
+       output_test_file=report["output_test_file"])
     print(f"[usercode] killed {len(kept)}/{len(mutants)} mutants; "
           f"tests -> {out_tests if kept else '(none kept)'}; "
           f"report -> {report_path}")

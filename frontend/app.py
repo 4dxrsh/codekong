@@ -1,10 +1,11 @@
-"""CodeKong UI — judge-facing site + the practical "generate tests for my
-file" flow. Read-only over real pipeline outputs (no invented numbers; every
-missing dataset renders an explicit empty state), plus a background-job
-wrapper around generate_tests.generate_tests_for_file for uploads.
+"""CodeKong UI — panel-facing site + a fully transparent "generate tests for
+my file" demo. Read-only over real pipeline outputs (no invented numbers;
+missing data renders an explicit empty state). The Generate flow streams REAL
+pipeline events (functions found, mutant diffs, retrieved RAG chunks,
+validation verdicts) into an animated storyboard, so a non-technical panel
+can watch every step happen.
 
-Palette: warm dark (terracotta / peach / sand on brown-black), serif display
-headings. Run:  source venv/bin/activate && python -m frontend.app
+Run:  source venv/bin/activate && python -m frontend.app
 Then open http://localhost:5001
 """
 from __future__ import annotations
@@ -18,7 +19,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from flask import (Flask, abort, redirect, render_template_string,
+from flask import (Flask, abort, jsonify, redirect, render_template_string,
                    request, send_file, url_for)
 
 from frontend import data as D
@@ -28,11 +29,14 @@ UPLOADS = PROJECT_ROOT / "frontend" / "uploads"
 JOBS: dict[str, dict] = {}
 _JOBS_LOCK = threading.Lock()
 
-# Pipeline stages shown in the Generate job stepper (must mirror the
-# progress-callback stages in generate_tests.generate_tests_for_file).
-STAGES = ["Scaffold", "Mutate & filter", "Index", "Generate & validate", "Package"]
+STAGES = ["Read code", "Plant bugs", "Build memory", "Write & check tests", "Package"]
 
-# Warm translucent chips.
+# Panel-demo preset: chosen so a live run fits ~5 minutes on the target GPU.
+# k=3 (fewer retrieved chunks -> shorter prompts -> faster model calls; the
+# k-sweep belongs to the research page, not a live demo), 5 mutants, only the
+# fast mutant sources. DRY-RUN THIS before presenting; drop to 3 if too slow.
+DEMO_LIMIT, DEMO_K = 5, 3
+
 BADGE = {"syntactic": "#c9a0e8", "sdl": "#8fc8b5", "semantic": "#d9b96e",
          "higher_order": "#e06a55", "RAG": "#e0795a", "NO_RAG": "#9a8f82",
          "generated": "#9a8f82", "description": "#d9c7a7"}
@@ -48,21 +52,21 @@ BASE = """<!doctype html><html><head><meta charset="utf-8">
 body{margin:0;background:var(--bg);color:var(--ink);
 font:15px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased}
-nav{position:sticky;top:0;z-index:10;display:flex;gap:28px;align-items:center;
+nav{position:sticky;top:0;z-index:10;display:flex;gap:24px;align-items:center;
 height:54px;padding:0 max(24px,calc(50vw - 540px));
 background:rgba(19,16,16,.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
-nav .brand{font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--sand);
+nav .brand{font-weight:700;font-size:17px;color:var(--sand);
 font-family:"New York",Georgia,"Times New Roman",serif}
 nav a{color:var(--muted);text-decoration:none;font-size:13.5px;transition:color .15s}
 nav a:hover{color:var(--ink)} nav a.active{color:var(--peach)}
 main{max-width:1080px;margin:0 auto;padding:52px 24px 110px}
 h1{font-size:42px;font-weight:600;letter-spacing:-.02em;line-height:1.12;margin:.1em 0 .4em;
 font-family:"New York",Georgia,"Times New Roman",serif}
-h2{font-size:25px;font-weight:600;letter-spacing:-.01em;margin-top:2.2em;
+h2{font-size:25px;font-weight:600;margin-top:2.2em;
 font-family:"New York",Georgia,"Times New Roman",serif;color:var(--sand)}
 h3{font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:12px}
 p{color:#d9d0c4} .muted{color:var(--muted)}
-.lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:46em;font-weight:400}
+.lede{font-size:20px;line-height:1.5;color:var(--muted);max-width:46em}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
 padding:24px 28px;margin:18px 0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -77,6 +81,7 @@ pre,code,.mono{font-family:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,
 code{background:#241e19;padding:1px 6px;border-radius:6px;font-size:13px;color:var(--peach)}
 pre{background:#100d0b;border:1px solid var(--line);color:#e9e1d5;padding:16px 18px;
 border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.55}
+pre .dl{color:var(--red)} pre .al{color:var(--green)}
 table.diff{width:100%;border-collapse:collapse;font-size:12.5px;background:#100d0b;
 border-radius:12px;overflow:hidden;border:1px solid var(--line)}
 table.diff td{padding:1.5px 10px;white-space:pre;font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
@@ -86,6 +91,7 @@ tr.del td.code::before{content:"− ";color:var(--red)} tr.add td.code::before{c
 .pass{color:var(--green);font-weight:600}.fail{color:var(--red);font-weight:600}
 .pill-pass{background:rgba(127,201,143,.14);color:var(--green);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
 .pill-fail{background:rgba(224,106,85,.15);color:var(--red);padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
+.pill-warn{background:rgba(217,185,110,.15);color:#d9b96e;padding:2px 11px;border-radius:980px;font-weight:600;font-size:12px}
 .empty{padding:34px;text-align:center;color:var(--muted);background:var(--panel);
 border:1px dashed var(--line);border-radius:var(--radius)}
 .pipeline{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}
@@ -105,12 +111,19 @@ animation:pulse 1.4s infinite}
 height:2px;background:var(--line);z-index:-1}
 .step.done:not(:first-child)::before,.step.active:not(:first-child)::before{background:var(--accent)}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,121,90,.35)}50%{box-shadow:0 0 0 8px rgba(224,121,90,0)}}
+.story .card{animation:rise .45s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.livebar{display:flex;align-items:center;gap:10px;color:var(--peach);font-size:13.5px}
+.livedot{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite}
+.dbar{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+.dbar>i{display:block;height:100%;background:var(--accent)}
 details.ast{margin-left:15px;font-size:13px}
 details.ast>summary{cursor:pointer;padding:1px 6px;border-radius:6px;color:#cfc5b6;list-style:none}
 details.ast>summary::before{content:"▸ ";color:var(--muted);font-size:10px}
 details[open].ast>summary::before{content:"▾ "}
 details.ast>summary.marked{background:rgba(217,185,110,.18);color:#d9b96e;font-weight:600}
 details.ast>summary:hover{background:#221d18}
+details.src>summary{cursor:pointer;color:var(--muted);font-size:12.5px}
 input[type=text],textarea,select{width:100%;padding:10px 13px;border:1px solid var(--line);
 border-radius:10px;font-size:14px;background:#100d0b;color:var(--ink);outline:none}
 input:focus,textarea:focus{border-color:var(--accent)}
@@ -123,14 +136,17 @@ button:hover,.btn:hover{opacity:.85}
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
 padding:16px;text-align:center}
-.stat .v{font-size:27px;font-weight:700;letter-spacing:-.02em;color:var(--peach)}
+.stat .v{font-size:27px;font-weight:700;color:var(--peach)}
 .stat .l{font-size:12px;color:var(--muted)}
+.plain{background:rgba(217,199,167,.07);border-left:3px solid var(--sand);border-radius:0 10px 10px 0;
+padding:10px 16px;margin:10px 0;font-size:13.5px;color:var(--sand)}
 a{color:var(--peach);text-decoration:none}
 label{color:#d9d0c4;font-size:14px}
 </style></head><body>
 <nav><span class="brand">CodeKong</span>
 <a href="/" class="{{ 'active' if page=='home' }}">Home</a>
 <a href="/research-questions" class="{{ 'active' if page=='rq' }}">Research Questions</a>
+<a href="/papers" class="{{ 'active' if page=='papers' }}">Papers</a>
 <a href="/explore" class="{{ 'active' if page=='explore' }}">Explore</a>
 <a href="/passed-tests" class="{{ 'active' if page=='passed' }}">Passed Tests</a>
 <a href="/generate" class="{{ 'active' if page=='generate' }}">Generate</a>
@@ -165,8 +181,11 @@ app.jinja_env.globals.update(badge=badge)
 HOME = """
 <h1>Tests that hunt the bugs<br>your suite already missed.</h1>
 <p class="lede">CodeKong plants four escalating classes of artificial bugs in real code,
-keeps the ones the existing tests fail to catch, and measures whether showing an LLM the
+keeps the ones the existing tests fail to catch, and measures whether showing an AI the
 actual codebase (RAG) helps it write tests that kill them.</p>
+<div class="plain">In plain words: we deliberately break code in tiny ways, check which
+breaks nobody notices, and then see if an AI writes better bug-catching tests when it can
+read the codebase instead of guessing blind.</div>
 
 <h2>What is mutation testing?</h2>
 <div class="card">
@@ -183,43 +202,109 @@ def is_valid_password(pw):
 <p class="muted"><i>If the test suite never checks a password of exactly length 8, this
 mutant survives — and that survival is exactly the blind spot mutation testing exists to find.</i></p>
 <table class="data"><tr><th>Class</th><th>What it does</th></tr>
-<tr><td>{{ badge('sdl')|safe }}</td><td>Removes a statement outright (Python <code>ast</code>)</td></tr>
-<tr><td>{{ badge('syntactic')|safe }}</td><td>Swaps an operator or constant (<code>&gt;=</code> → <code>&gt;</code>), via mutmut</td></tr>
-<tr><td>{{ badge('semantic')|safe }}</td><td>An LLM injects a realistic, natural-looking bug rather than a fixed rule</td></tr>
-<tr><td>{{ badge('higher_order')|safe }}</td><td>Combines two first-order mutants in one function (Jia &amp; Harman), simulating interacting faults</td></tr>
+<tr><td>{{ badge('sdl')|safe }}</td><td>Removes one line of code outright — like a developer accidentally deleting a step</td></tr>
+<tr><td>{{ badge('syntactic')|safe }}</td><td>Swaps an operator (<code>&gt;=</code> → <code>&gt;</code>) — a classic typo-style bug</td></tr>
+<tr><td>{{ badge('semantic')|safe }}</td><td>An AI writes a realistic, natural-looking bug — the kind a tired developer ships</td></tr>
+<tr><td>{{ badge('higher_order')|safe }}</td><td>Two bugs combined in one function — they can mask each other, making them the hardest to catch</td></tr>
 </table></div>
 
 <h2>The pipeline</h2>
 <div class="card"><div class="pipeline">
-<div class="stage"><b>1 · Ingest</b>Parse the subject repo's functions via AST</div><div class="arrow">→</div>
-<div class="stage"><b>2 · Index</b>Embed function, docstring and test chunks into local ChromaDB</div><div class="arrow">→</div>
-<div class="stage"><b>3 · Mutate</b>Four strategies generate candidate mutants</div><div class="arrow">→</div>
-<div class="stage"><b>4 · Filter</b>Run the existing suite; keep only survivors</div><div class="arrow">→</div>
-<div class="stage"><b>5 · Generate</b>Top-K chunks + diff + class-aware prompt → local LLM, one validator-guided retry</div><div class="arrow">→</div>
-<div class="stage"><b>6 · Validate</b>Pass on original AND fail on mutant = kill; tokens, K, chunks logged</div>
+<div class="stage"><b>1 · Ingest</b>Read the code and split it into functions</div><div class="arrow">→</div>
+<div class="stage"><b>2 · Index</b>Store every function in a searchable AI memory (RAG)</div><div class="arrow">→</div>
+<div class="stage"><b>3 · Mutate</b>Plant the four kinds of bugs</div><div class="arrow">→</div>
+<div class="stage"><b>4 · Filter</b>Keep only bugs the existing tests miss</div><div class="arrow">→</div>
+<div class="stage"><b>5 · Generate</b>AI writes a test aimed at each bug — with or without reading the codebase</div><div class="arrow">→</div>
+<div class="stage"><b>6 · Validate</b>A test counts only if it passes on the real code AND fails on the buggy one</div>
 </div>
-<p class="muted">The research lives in the ablations: identical generation runs closed-book
-(NO_RAG, MuTAP-style) and with retrieved context (RAG) at K = 3/5/8, per mutation class —
-answering whether context helps, where it helps most, how much is right, and what a kill costs.</p></div>
+<p class="muted">The research lives in the comparisons: identical generation runs closed-book
+(NO_RAG) and with retrieved context (RAG) at K = 3/5/8, per bug class — answering whether
+context helps, where it helps most, how much is right, and what a catch costs.</p>
+<div class="plain">Want to see it live? The <a href="/generate">Generate</a> page runs this
+whole pipeline on any Python file and shows every step as it happens.</div></div>
 
 <h2>References</h2>
-<div class="card"><ul class="refs">
-<li>Jia &amp; Harman, <i>Higher Order Mutation Testing</i>, IST 2009. <span class="why">— foundational definition of the higher-order strategy CodeKong implements.</span></li>
-<li>Degiovanni &amp; Papadakis, <i>μBERT</i>, ICSTW 2022; Tip, Bell &amp; Schäfer, <i>LLMorpheus</i>, 2024. <span class="why">— LLMs to <i>generate</i> mutants; CodeKong instead uses RAG-augmented LLMs on the <i>test-generation</i> side, to kill them.</span></li>
-<li>Bouafif, Hamdaqa &amp; Zulkoski, <i>PRIMG</i>, EASE 2025. <span class="why">— prioritizes which mutants to target; orthogonal to CodeKong's how-to-kill focus.</span></li>
-<li>Dakhel et al., <i>MuTAP</i>, 2023. <span class="why">— pioneered prompting with surviving mutants, closed-book; CodeKong's RAG-vs-NO_RAG ablation directly tests what codebase context adds on top.</span></li>
-<li><i>SMART</i> (Boosting LLMs for Mutation Generation), 2026. <span class="why">— retrieves historical bug-fix pairs to generate better mutants; CodeKong retrieves codebase context to kill surviving ones.</span></li>
-<li>Foster et al., <i>Mutation-Guided LLM-based Test Generation at Meta</i> (ACH), FSE 2025. <span class="why">— the industrial-scale cousin; CodeKong runs the idea as a controlled, ablation-driven study.</span></li>
-<li>Chang et al., <i>AdverTest</i>, 2026. <span class="why">— adversarial co-evolution of tests and mutants; CodeKong fixes the mutation strategies and isolates what RAG context does.</span></li>
-<li><i>LLMs for Unit Testing: A Systematic Literature Review</i>, 2025. <span class="why">— survey situating RAG-for-testing.</span></li>
-</ul></div>
-<p style="text-align:center;margin-top:38px"><a class="btn" href="/research-questions">See the research questions answered</a></p>
+<div class="card"><p class="muted">Eight papers ground this work — see the
+<a href="/papers">Papers</a> page for what each one did, what it concluded, the gap it
+left, and how CodeKong covers that gap.</p></div>
+<p style="text-align:center;margin-top:38px"><a class="btn" href="/generate">Run the live demo</a></p>
 """
 
 
 @app.route("/")
 def home():
     return page("Home", "home", HOME)
+
+
+# ----------------------------------------------------------------- Papers
+_PAPERS = [
+ ("Higher Order Mutation Testing", "Jia & Harman — Information and Software Technology, 2009",
+  "Defined higher-order mutants: instead of planting one bug, combine two or more in the same program.",
+  "Combined bugs can be subtler than single ones — they sometimes partially cancel each other out, so simple tests sail right past them.",
+  "It defined the harder bug class but said little about how to actually WRITE tests that catch them — and nothing about modern AI doing that job.",
+  "CodeKong implements their higher-order class as its hardest difficulty tier and measures whether giving the AI codebase context helps specifically on these."),
+ ("μBERT: Mutation Testing using Pre-Trained Language Models", "Degiovanni & Papadakis — ICSTW 2022",
+  "Used a language model (BERT) to invent mutants: mask a piece of code and let the model fill in something plausible-but-wrong.",
+  "Model-generated mutants are realistic and useful for evaluating test suites.",
+  "The AI is used only to CREATE bugs. Killing them — writing the tests — is left to humans or older tools.",
+  "CodeKong flips the AI to the other side: it uses an LLM (with retrieval) to KILL surviving mutants, not to create them."),
+ ("LLMorpheus: Mutation Testing using Large Language Models", "Tip, Bell & Schäfer — 2024",
+  "Same direction as μBERT with modern LLMs: prompt an LLM to propose realistic code mutations.",
+  "LLMs produce mutants that resemble real-world bugs better than rule-based mutation operators.",
+  "Again, generation-side only — no answer to whether LLMs can reliably write the tests that catch such bugs.",
+  "CodeKong uses an LLM for realistic mutants too (our 'semantic' class), but its core contribution is on the test-writing side."),
+ ("MuTAP: Effective Test Generation Using Pre-trained LLMs and Mutation Testing", "Dakhel et al. — 2023",
+  "Pioneered putting the surviving mutant INTO the prompt: 'here is a bug the tests missed — write a test that catches it.'",
+  "Mutant-aware prompting produces stronger tests than plain 'write me tests' prompting.",
+  "The model works closed-book: it sees the mutant and the old test, but never the rest of the codebase — no imports, no conventions, no related functions.",
+  "This is CodeKong's direct baseline. Our NO_RAG condition mirrors MuTAP; our RAG condition adds retrieved codebase context on top, and the whole experiment measures exactly what that addition buys."),
+ ("PRIMG: Efficient LLM-driven Test Generation Using Mutant Prioritization", "Bouafif, Hamdaqa & Zulkoski — EASE 2025",
+  "Ranked mutants by how valuable they are to target, so the LLM's limited budget goes to the most useful bugs first.",
+  "Prioritization saves significant generation budget for the same test-suite improvement.",
+  "It decides WHICH bugs to aim at, but doesn't improve HOW the killing test gets written.",
+  "Orthogonal to CodeKong: we keep the mutant set fixed and improve the generation step itself with retrieval. The two ideas could be combined."),
+ ("SMART: Semantic Mutation with Adaptive Retrieval and Tuning", "from 'Boosting LLMs for Mutation Generation' — 2026",
+  "Combined RAG with mutation work — retrieving real historical bug-fix pairs to help an LLM invent better mutants.",
+  "Retrieval of real bug history makes generated mutants more realistic.",
+  "Retrieval is aimed at bug CREATION. Whether retrieval helps bug CATCHING was untested.",
+  "CodeKong retrieves codebase context to kill mutants that survive — the same tool pointed at the opposite, unanswered side."),
+ ("Mutation-Guided LLM-based Test Generation at Meta (ACH)", "Foster et al. — FSE 2025",
+  "An industrial system at Meta that hardens code against specific fault classes using LLM-generated tests, at company scale.",
+  "The approach works in production: real faults get covered by generated tests that engineers accept.",
+  "As an industrial deployment it doesn't isolate WHY it works — there's no controlled comparison of what codebase context contributes.",
+  "CodeKong runs the equivalent idea as a small, controlled, ablation-driven study: same model, same prompts, context on vs. off, measured per bug class."),
+ ("Test vs. Mutant: Adversarial LLM Agents for Robust Unit Test Generation (AdverTest)", "Chang et al. — 2026",
+  "Two AI agents play against each other: one invents mutants, the other writes tests, co-evolving in a loop.",
+  "The adversarial loop produces more robust test suites than one-shot generation.",
+  "Because mutation and test generation evolve together, you can't attribute gains to any single ingredient.",
+  "CodeKong fixes the mutation strategies and changes exactly one variable — retrieved context — so the measured effect is attributable."),
+ ("Large Language Models for Unit Testing: A Systematic Literature Review", "2025",
+  "Surveyed the whole field of LLMs for software testing.",
+  "Maps what has been tried; notes retrieval-augmented approaches to TEST GENERATION are underexplored.",
+  "A survey doesn't run experiments — it points at holes.",
+  "The hole it points at — does RAG help LLMs write better tests, and when? — is precisely CodeKong's research question."),
+]
+
+PAPERS = """
+<h1>The papers behind CodeKong</h1>
+<p class="lede">Every design choice in this project traces to prior work. For each paper:
+what they did, what they concluded, the gap they left, and what we did about it.</p>
+{% for title, venue, did, concl, gap, ours in papers %}
+<div class="card">
+<h2 style="margin-top:0;font-size:20px">{{ title }}</h2>
+<p class="muted" style="margin-top:-6px">{{ venue }}</p>
+<p><b style="color:var(--sand)">What they did.</b> {{ did }}</p>
+<p><b style="color:var(--sand)">What they concluded.</b> {{ concl }}</p>
+<p><b style="color:var(--red)">The gap.</b> {{ gap }}</p>
+<p><b style="color:var(--green)">What CodeKong does about it.</b> {{ ours }}</p>
+</div>
+{% endfor %}
+"""
+
+
+@app.route("/papers")
+def papers():
+    return page("Papers", "papers", PAPERS, papers=_PAPERS)
 
 
 # ------------------------------------------------------------------ About
@@ -248,28 +333,31 @@ def about():
 # --------------------------------------------------------------------- RQs
 RQ = """
 <h1>Research Questions</h1>
+<div class="plain">Plain words: a "kill rate" is the share of planted bugs that the AI's
+new tests successfully caught. Higher is better. RAG = the AI could read the codebase;
+NO_RAG = it worked blind.</div>
 {% if not have_data %}<div class="empty">No pipeline results found yet under
 <code>module4_eval/results/</code>. Run <code>python run_pipeline.py --repo sorts</code>
 (or a <code>--limit</code> smoke run) and reload — this page computes everything from
 the real CSVs and never shows placeholder numbers.</div>{% endif %}
 
-{% if d.rq1 %}<h2>RQ1 — Does RAG beat closed-book generation?</h2>
+{% if d.rq1 %}<h2>RQ1 — Does reading the codebase help at all?</h2>
 <div class="card"><canvas id="c1" height="100"></canvas><p>{{ rq1_take }}</p></div>{% endif %}
 
-{% if d.rq2 %}<h2>RQ2 — Does the benefit vary by mutation class?</h2>
+{% if d.rq2 %}<h2>RQ2 — Does it help more as bugs get harder?</h2>
 <div class="card"><canvas id="c2" height="110"></canvas><p>{{ rq2_take }}</p></div>{% endif %}
 
-{% if d.rq3 %}<h2>RQ3 — How much retrieved context is right?</h2>
+{% if d.rq3 %}<h2>RQ3 — How much context is the right amount?</h2>
 <div class="card"><canvas id="c3" height="100"></canvas><p>{{ rq3_take }}</p></div>{% endif %}
 
-{% if d.rq4 and d.rq4.rows %}<h2>RQ4 — Is the cost worth it, per bug type?</h2>
+{% if d.rq4 and d.rq4.rows %}<h2>RQ4 — Is the extra work worth it, per bug type?</h2>
 <div class="card"><table class="data"><tr><th>Condition</th><th>Class</th>
 <th>Total tokens</th><th>Kills</th><th>Tokens / kill</th></tr>
 {% for r in d.rq4.rows %}<tr><td>{{ badge(r.condition)|safe }}</td><td>{{ r.mutation_class }}</td>
 <td>{{ "{:,}".format(r.tokens) }}</td><td>{{ r.kills }}</td>
 <td>{{ "{:,}".format(r.tokens_per_kill) if r.tokens_per_kill else "— (no kills yet)" }}</td></tr>{% endfor %}
-</table><p class="muted">Token counts come from the Ollama call log (eval + prompt tokens);
-a local model has no bill, so tokens are the cost-equivalent unit.</p></div>{% endif %}
+</table><p class="muted">Tokens are the AI's unit of work — a local model has no bill,
+so tokens-per-kill is the cost-equivalent measure.</p></div>{% endif %}
 
 <script>
 const D = {{ d | tojson }};
@@ -305,9 +393,9 @@ def rqs():
         nor = d["rq1"].get("NO_RAG", {}).get("kill_rate")
         if rag is None or nor is None:
             return "Only one condition has been run so far — no comparison yet."
-        verdict = ("RAG kills more" if rag > nor else
-                   "NO_RAG kills more" if nor > rag else "The conditions tie")
-        return (f"{verdict}: RAG {rag:.1%} vs closed-book {nor:.1%} "
+        verdict = ("Reading the codebase helped" if rag > nor else
+                   "Working blind did better" if nor > rag else "The conditions tie")
+        return (f"{verdict}: RAG caught {rag:.1%} of bugs vs {nor:.1%} closed-book "
                 f"(n={d['rq1'].get('RAG', {}).get('n', 0)} RAG runs). "
                 "Reported as computed — no shading either way.")
 
@@ -318,19 +406,18 @@ def rqs():
                  zip(d["rq2"]["classes"], d["rq2"]["rag"], d["rq2"]["norag"])]
         deltas = [f"{c}: {v:+.1%}" for c, v in pairs]
         mono = all(b[1] >= a[1] for a, b in zip(pairs, pairs[1:]))
-        return ("Per-class RAG deltas — " + "; ".join(deltas) + ". "
-                + ("The hardness gradient holds (non-decreasing) on this data."
-                   if mono else "The hardness gradient does NOT hold cleanly "
-                   "on this data — an honest finding, not a failure."))
+        return ("How much RAG helped, per bug class — " + "; ".join(deltas) + ". "
+                + ("The 'harder bugs benefit more' pattern holds on this data."
+                   if mono else "The 'harder bugs benefit more' pattern does NOT "
+                   "hold cleanly on this data — an honest finding, not a failure."))
 
     def take3():
         if not d["rq3"]:
             return ""
         ks, vr = d["rq3"]["k"], d["rq3"]["valid_test_rate"]
         best = ks[vr.index(max(vr))]
-        return (f"Valid-test rate peaks at K={best} on current data. Watch "
-                "whether more context helps or drowns the model — both are "
-                "reportable outcomes.")
+        return (f"Test quality peaks at K={best} on current data. More context is "
+                "not automatically better — too much can drown the model.")
 
     return page("Research Questions", "rq", RQ, d=d, have_data=have,
                 rq1_take=take1(), rq2_take=take2(), rq3_take=take3())
@@ -339,9 +426,10 @@ def rqs():
 # ----------------------------------------------------------------- Explore
 EXPLORE = """
 <h1>Explore</h1>
-<p class="muted">Every mutant in the current corpus. Subjects are the real configured
-repos (sorts, schedule, and user-uploaded files) — this deployment has not processed
-BugsInPy/HumanEval/MBPP and will not pretend it has.</p>
+<div class="plain">Every artificial bug we planted, and what happened to it. Click any
+row to see the bug inside the code, what the AI looked up, and the tests it wrote.</div>
+<p class="muted">Subjects are the real configured repos (sorts, schedule, and
+user-uploaded files) — nothing here is mocked.</p>
 {% if not rows %}<div class="empty">No mutants yet — run the mutate phase first.</div>{% else %}
 <div class="card" style="padding:14px 18px">
 <select id="fsub" onchange="filt()"><option value="">all subjects</option>
@@ -386,13 +474,16 @@ DETAIL = """
 <code>{{ m.function }}</code> (line {{ m.line }}) — <span class="muted">{{ m.mutation_description }}</span></p>
 <div class="grid2">
 <div><h3>Source with mutation</h3>
+<div class="plain">Red lines were removed by the bug, green lines were added.</div>
 <table class="diff">{% for r in diff %}
 <tr class="{{ r.tag }}"><td class="ln">{{ r.a or '' }}</td><td class="ln">{{ r.b or '' }}</td>
 <td class="code">{{ r.text }}</td></tr>{% endfor %}</table>
 {% if m.mutation_class == 'higher_order' %}<p class="muted">Higher-order mutant:
 every changed region above is highlighted, not just one.</p>{% endif %}</div>
-<div><h3>AST — mutated nodes marked</h3>
-<div class="card" style="max-height:480px;overflow:auto;padding:14px">{{ ast_html|safe }}</div></div>
+<div><h3>Code structure (AST) — bug location marked</h3>
+<div class="plain">This is the code as the computer sees it — a tree. Highlighted nodes
+are where the bug lives.</div>
+<div class="card" style="max-height:440px;overflow:auto;padding:14px">{{ ast_html|safe }}</div></div>
 </div>
 {% else %}<div class="empty">This mutant is not in the current mutant set
 (results from an earlier run) — showing its run records only.</div>{% endif %}
@@ -408,7 +499,9 @@ every changed region above is highlighted, not just one.</p>{% endif %}</div>
 {% if t.code %}<pre>{{ t.code }}</pre>{% endif %}</div>
 {% endfor %}
 
-<h2>RAG panel — retrieved chunks actually used</h2>
+<h2>RAG panel — what the AI looked up</h2>
+<div class="plain">These are the actual pieces of code the AI retrieved from its memory
+before writing the test. Smaller distance = closer match.</div>
 {% if not chunks %}<div class="empty">No retrieved-context provenance for this mutant
 (NO_RAG runs, or records predating chunk logging).</div>{% endif %}
 {% for c in chunks %}<div class="card"><b class="mono">{{ c.file }} · {{ c.qualname }}</b>
@@ -447,10 +540,8 @@ def detail(mutant_id):
 # ------------------------------------------------------------ Passed tests
 PASSED = """
 <h1>Passed Tests</h1>
-<p class="muted">Every generated test that passed on the original code (valid tests),
-across the whole corpus. KILLED additionally means it failed on its mutant — the full
-kill criterion. Subjects' original suites gate mutant survival upstream and are not
-itemized here (doctest-based suites don't decompose into named cases).</p>
+<div class="plain">Every AI-written test that works on the real code. "KILLED" means it
+also catches its target bug — the full proof. These are the tests you'd actually keep.</div>
 {% if not rows %}<div class="empty">No validated tests yet.</div>{% else %}
 <input type="text" id="q" placeholder="Search mutant, subject, class…"
  onkeyup="f()" style="margin-bottom:14px">
@@ -480,22 +571,30 @@ def passed():
 
 # --------------------------------------------------- Generate (user flow)
 GENERATE = """
-<h1>Generate tests for your code.</h1>
-<p class="lede">Upload one Python file, describe what it does, and get back only tests
-that provably pass on your code and fail on a specific injected bug.</p>
+<h1>Generate tests. Watch it happen.</h1>
+<p class="lede">Upload one Python file and describe what it does. CodeKong will plant
+bugs in it, look things up in its memory, write tests, check them — and show you every
+step live.</p>
 <div class="card"><form method="post" enctype="multipart/form-data">
 <p><label>Python file (.py)<br><input type="file" name="pyfile" accept=".py" required
  style="margin-top:6px;color:#d9d0c4"></label></p>
-<p><label>What does this code do? <span class="muted">(context given to the model)</span><br>
+<p><label>What does this code do? <span class="muted">(the AI reads this)</span><br>
 <textarea name="description" rows="3" required style="margin-top:6px"
  placeholder="e.g. Utility functions for clamping and interpolating numeric ranges"></textarea></label></p>
+<p><label><input type="checkbox" name="demo" checked onchange="adv.style.display=this.checked?'none':'block'">
+<b>Panel demo mode (≈5 minutes)</b> — {{ demo_limit }} bugs, {{ demo_k }} memory look-ups per bug,
+fast bug sources only</label></p>
+<div id="adv" style="display:none">
 <p style="display:flex;gap:26px;align-items:center;flex-wrap:wrap">
 <label>Mutant cap <input type="text" name="limit" value="15" style="width:64px;margin-left:6px"></label>
-<label><input type="checkbox" name="skip_semantic" checked> skip LLM-generated mutants (faster)</label>
-<label><input type="checkbox" name="use_rag" checked> use RAG retrieval</label></p>
-<button type="submit">Start generation</button>
-<p class="muted" style="margin-top:10px">Runs a local LLM — expect minutes, not seconds.
-Constraints: pure Python, deterministic, no required file/network I/O.</p></form></div>
+<label>K <input type="text" name="k" value="5" style="width:50px;margin-left:6px"></label>
+<label><input type="checkbox" name="skip_semantic" checked> skip AI-generated bugs (faster)</label>
+<label><input type="checkbox" name="use_rag" checked> use RAG memory</label></p>
+</div>
+<button type="submit">Start — and watch every step</button>
+<p class="muted" style="margin-top:10px">Runs a local AI model. Tip for presenting: do one
+warm-up run first so the model is loaded, and dry-run the demo to confirm timing on your
+machine.</p></form></div>
 {% if jobs %}<h2>Recent jobs</h2><table class="data">
 <tr><th>Job</th><th>File</th><th>Status</th><th></th></tr>
 {% for j in jobs %}<tr><td class="mono">{{ j.id[:8] }}</td><td>{{ j.filename }}</td>
@@ -507,46 +606,117 @@ JOB = """
 <p><a href="/generate">← Generate</a></p>
 <h1 style="font-size:26px">{{ j.filename }} <span class="muted mono" style="font-size:15px">{{ j.id[:8] }}</span></h1>
 
-<div class="card"><div class="stepper">
-{% for s in stages %}<div class="step {{ 'done' if (j.status != 'running') or loop.index0 < j.stage
- else ('active' if loop.index0 == j.stage else '') }}">
-<div class="dot">{% if (j.status != 'running') or loop.index0 < j.stage %}✓{% else %}{{ loop.index }}{% endif %}</div>
-{{ s }}</div>{% endfor %}
+<div class="card"><div class="stepper" id="stepper">
+{% for s in stages %}<div class="step" data-i="{{ loop.index0 }}">
+<div class="dot">{{ loop.index }}</div>{{ s }}</div>{% endfor %}
 </div>
-{% if j.status == 'running' %}<p style="text-align:center" class="muted">
-{{ j.detail or 'starting…' }} · {{ j.age }}s elapsed · this page refreshes every 5 s</p>{% endif %}</div>
+<p class="livebar" id="livebar" style="justify-content:center"><span class="livedot"></span>
+<span id="livetext">connecting…</span></p></div>
 
-{% if j.status == 'running' %}
-<script>setTimeout(()=>location.reload(), 5000)</script>
-{% elif j.status == 'error' %}<div class="card"><span class="fail">FAILED</span>
-<pre>{{ j.error }}</pre></div>
-{% else %}
-<div class="statgrid">
-<div class="stat"><div class="v">{{ j.report.mutants_attempted }}</div><div class="l">mutants attempted</div></div>
-<div class="stat"><div class="v">{{ j.report.mutants_killed }}</div><div class="l">killed → tests kept</div></div>
-<div class="stat"><div class="v">{{ '%.0f%%' % (100*j.report.kill_rate) if j.report.kill_rate is not none else '—' }}</div><div class="l">kill rate</div></div>
-<div class="stat"><div class="v">{{ '%.0f' % j.report.wall_seconds }}s</div><div class="l">wall time</div></div>
-<div class="stat"><div class="v" style="font-size:16px">{{ j.report.model }}</div><div class="l">model</div></div></div>
-<div class="card"><h3>Outcome breakdown</h3><table class="data">
-<tr><th>Status</th><th>Count</th><th>Meaning</th></tr>
-{% for s, n in j.report.statuses.items() %}<tr><td>{{ s }}</td><td>{{ n }}</td>
-<td class="muted">{{ {'KILLED':'valid test that catches the bug — kept',
-'SURVIVED':'test valid but did not catch this bug',
-'INVALID_TEST':'no generated test passed on your original code',
-'GEN_FAILED':'model produced no valid Python'}.get(s, '') }}</td></tr>{% endfor %}</table></div>
-{% if j.report.output_test_file %}
-<p><a class="btn" href="/generate/job/{{ j.id }}/download">Download test file</a>
-<span class="muted" style="margin-left:14px">drops straight into your project; run with pytest</span></p>
-<div class="card"><pre>{{ preview }}</pre></div>
-{% else %}<div class="empty">No mutants were killed, so no test file was kept. Likely causes:
-model tier too weak, code needs file/network I/O, or the mutants were equivalent.
-The per-mutant records in the report JSON say which.</div>{% endif %}
-{% endif %}
+<div class="story" id="story"></div>
+<div id="finale"></div>
+
+<script>
+const JOB_ID = {{ j.id | tojson }};
+const NSTAGE = {{ stages|length }};
+let since = 0, done = false;
+const story = document.getElementById('story');
+const esc = s => (s??'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const diffHtml = d => esc(d).split('\\n').map(l =>
+  l.startsWith('+') ? `<span class="al">${l}</span>` :
+  l.startsWith('-') ? `<span class="dl">${l}</span>` : l).join('\\n');
+const chipCls = {sdl:'#8fc8b5', syntactic:'#c9a0e8', semantic:'#d9b96e', higher_order:'#e06a55'};
+const chip = c => `<span class="chip" style="background:${chipCls[c]||'#9a8f82'}26;color:${chipCls[c]||'#9a8f82'}">${esc(c)}</span>`;
+function section(title, plain, inner){
+  story.insertAdjacentHTML('beforeend',
+    `<div class="card"><h2 style="margin-top:0;font-size:19px">${title}</h2>
+     <div class="plain">${plain}</div>${inner}</div>`);
+}
+const RENDER = {
+ scaffold: p => section('Step 1 — Your code, understood',
+   'CodeKong read the file and split it into functions — the units it will protect with tests. It also stored your description, so the AI knows the intent, not just the syntax.',
+   p.functions.map(f=>`<details class="src"><summary><code>${esc(f.name)}</code> · ${f.lines} lines</summary><pre>${esc(f.source)}</pre></details>`).join('')
+   + `<p class="muted" style="margin-top:8px">Your description: “${esc(p.description)}”</p>`),
+ mutants: p => section('Step 2 — Bugs planted (mutants)',
+   `It created ${p.mutants.length} copies of your code, each with ONE deliberate small bug that your existing checks do not catch. Red = removed, green = added.`,
+   p.mutants.map(m=>`<div style="margin:10px 0">${chip(m.mutation_class)}
+     <b class="mono" style="font-size:12.5px">${esc(m.id)}</b>
+     <div class="muted" style="font-size:13px">${esc(m.description)}</div>
+     <details class="src"><summary>show the exact change</summary><pre>${diffHtml(m.diff)}</pre></details></div>`).join('')),
+ indexed: p => section('Step 3 — The AI’s memory (RAG)',
+   `Every function and docstring was converted into a numerical fingerprint (an “embedding”) and stored in a local search index — ${p.chunks} chunks, using the ${esc(p.embedding_model)} model. When the AI writes a test, it looks things up here instead of guessing.`,
+   ''),
+ retrieve: p => section(`Step 4 — What the AI looked up for <span class="mono" style="font-size:14px">${esc(p.mutant_id)}</span>`,
+   `Before writing a test, the AI searched its memory and pulled the ${p.chunks.length} closest pieces of context (k=${p.k}, plus your description). Smaller distance = closer match.`,
+   p.chunks.map(c=>{
+     const d = c.distance==null ? null : Math.max(0, Math.min(1, 1-c.distance));
+     return `<div style="margin:8px 0"><b class="mono" style="font-size:12.5px">${esc(c.qualname)}</b>
+       ${chip(c.kind)} ${c.distance!=null?`<span class="muted">distance ${c.distance.toFixed(3)}</span>
+       <div class="dbar"><i style="width:${(d*100).toFixed(0)}%"></i></div>`:''}
+       <details class="src"><summary>show chunk</summary><pre>${esc(c.snippet)}</pre></details></div>`;
+   }).join('')),
+ result: p => {
+   const pill = p.status==='KILLED' ? '<span class="pill-pass">BUG CAUGHT (killed)</span>'
+     : p.status==='SURVIVED' ? '<span class="pill-fail">bug not caught</span>'
+     : `<span class="pill-warn">${esc(p.status)}</span>`;
+   const story_ = p.validations.map(v=>{
+     const ok = v.status==='PASS';
+     return `<p style="margin:4px 0"><b>Attempt ${v.attempt}:</b>
+       <span class="${ok?'pass':'fail'}">${ok?'caught the bug':'did not work'}</span>
+       <span class="muted">— ${esc(v.reason)}</span></p>`;}).join('');
+   const retry = p.retry_used ? '<p class="muted">The first try failed, so the checker told the AI exactly why, and it got ONE retry — that feedback loop is the “agentic” part.</p>' : '';
+   return section(`Verdict for <span class="mono" style="font-size:14px">${esc(p.mutant_id)}</span> ${pill}`,
+     'A test only counts if it PASSES on your real code AND FAILS on the buggy copy — both checks actually ran, just now.',
+     story_ + retry + (p.test_code?`<details class="src" open><summary>the winning test</summary><pre>${esc(p.test_code)}</pre></details>`:''));
+ },
+ done: p => {
+   document.getElementById('finale').innerHTML = `
+     <div class="card"><h2 style="margin-top:0">Done.</h2>
+     <div class="statgrid">
+     <div class="stat"><div class="v">${p.mutants_attempted}</div><div class="l">bugs planted</div></div>
+     <div class="stat"><div class="v">${p.mutants_killed}</div><div class="l">bugs caught → tests kept</div></div>
+     <div class="stat"><div class="v">${p.kill_rate!=null?Math.round(p.kill_rate*100)+'%':'—'}</div><div class="l">catch rate</div></div>
+     <div class="stat"><div class="v">${Math.round(p.wall_seconds)}s</div><div class="l">total time</div></div></div>
+     ${p.output_test_file?`<p style="margin-top:16px"><a class="btn" href="/generate/job/${JOB_ID}/download">Download the test file</a>
+     <span class="muted" style="margin-left:12px">every test in it is proof-carrying: passes on your code, fails on its bug</span></p>`
+     :`<div class="empty" style="margin-top:14px">No bugs were caught this run, so no test file was kept — the per-bug verdicts above say why.</div>`}
+     </div>`;
+ }
+};
+function setStage(stage, running){
+  document.querySelectorAll('#stepper .step').forEach(el=>{
+    const i = +el.dataset.i;
+    el.className = 'step ' + (!running || i < stage ? (i<=stage||!running?'done':'') :
+                              i === stage ? 'active' : '');
+    el.querySelector('.dot').textContent = (!running || i < stage) ? '✓' : (i+1);
+  });
+}
+async function poll(){
+  if (done) return;
+  try{
+    const r = await fetch(`/generate/job/${JOB_ID}/events.json?since=${since}`);
+    const j = await r.json();
+    for (const ev of j.events){ since = ev.seq + 1; (RENDER[ev.kind]||(()=>{}))(ev.payload); }
+    setStage(j.stage, j.status === 'running');
+    document.getElementById('livetext').textContent =
+      j.status === 'running' ? (j.detail || 'working…') :
+      j.status === 'error' ? 'failed — see below' : 'finished';
+    if (j.status === 'error'){
+      story.insertAdjacentHTML('beforeend', `<div class="card"><span class="fail">FAILED</span><pre>${esc(j.error)}</pre></div>`);
+      done = true;
+    }
+    if (j.status === 'done'){ done = true;
+      document.getElementById('livebar').style.display='none'; }
+  }catch(e){ /* transient; keep polling */ }
+  if (!done) setTimeout(poll, 1500);
+}
+poll();
+</script>
 """
 
 
 def _run_job(job_id: str, path: Path, description: str, limit: int,
-             skip_semantic: bool, use_rag: bool):
+             k: int | None, skip_semantic: bool, use_rag: bool):
     from generate_tests import generate_tests_for_file
 
     def cb(stage: int, detail: str):
@@ -554,10 +724,18 @@ def _run_job(job_id: str, path: Path, description: str, limit: int,
             if job_id in JOBS:
                 JOBS[job_id].update(stage=stage, detail=detail)
 
+    def ev(kind: str, payload: dict):
+        with _JOBS_LOCK:
+            if job_id in JOBS:
+                seq = len(JOBS[job_id]["events"])
+                JOBS[job_id]["events"].append({"seq": seq, "kind": kind,
+                                               "payload": payload})
+
     try:
-        report = generate_tests_for_file(path, description, limit=limit,
+        report = generate_tests_for_file(path, description, limit=limit, k=k,
                                          skip_semantic=skip_semantic,
-                                         use_rag=use_rag, progress=cb)
+                                         use_rag=use_rag, progress=cb,
+                                         on_event=ev)
         with _JOBS_LOCK:
             JOBS[job_id].update(status="done", report=report,
                                 stage=len(STAGES) - 1)
@@ -578,23 +756,33 @@ def generate():
         dest = UPLOADS / f"{int(time.time())}_{Path(f.filename).name}"
         f.save(dest)
         job_id = uuid.uuid4().hex
-        try:
-            limit = max(1, int(request.form.get("limit", "15")))
-        except ValueError:
-            limit = 15
+        if "demo" in request.form:
+            limit, k = DEMO_LIMIT, DEMO_K
+            skip_semantic, use_rag = True, True
+        else:
+            try:
+                limit = max(1, int(request.form.get("limit", "15")))
+            except ValueError:
+                limit = 15
+            try:
+                k = max(1, int(request.form.get("k", "5")))
+            except ValueError:
+                k = None
+            skip_semantic = "skip_semantic" in request.form
+            use_rag = "use_rag" in request.form
         with _JOBS_LOCK:
             JOBS[job_id] = {"id": job_id, "filename": f.filename,
                             "status": "running", "started": time.time(),
-                            "stage": 0, "detail": "",
+                            "stage": 0, "detail": "", "events": [],
                             "report": None, "error": None}
         threading.Thread(target=_run_job, daemon=True,
                          args=(job_id, dest, request.form["description"],
-                               limit, "skip_semantic" in request.form,
-                               "use_rag" in request.form)).start()
+                               limit, k, skip_semantic, use_rag)).start()
         return redirect(url_for("job_page", job_id=job_id))
     with _JOBS_LOCK:
         jobs = sorted(JOBS.values(), key=lambda j: -j["started"])[:10]
-    return page("Generate", "generate", GENERATE, jobs=jobs)
+    return page("Generate", "generate", GENERATE, jobs=jobs,
+                demo_limit=DEMO_LIMIT, demo_k=DEMO_K)
 
 
 @app.route("/generate/job/<job_id>")
@@ -603,16 +791,20 @@ def job_page(job_id):
         j = dict(JOBS.get(job_id) or {})
     if not j:
         abort(404)
-    j["age"] = int(time.time() - j["started"])
-    j.setdefault("stage", 0)
-    j.setdefault("detail", "")
-    preview = ""
-    if j.get("report") and j["report"].get("output_test_file"):
-        p = Path(j["report"]["output_test_file"])
-        if p.exists():
-            preview = p.read_text(encoding="utf-8")[:3000]
-    return page(f"Job {job_id[:8]}", "generate", JOB, j=j, preview=preview,
-                stages=STAGES)
+    return page(f"Job {job_id[:8]}", "generate", JOB, j=j, stages=STAGES)
+
+
+@app.route("/generate/job/<job_id>/events.json")
+def job_events(job_id):
+    since = request.args.get("since", 0, type=int)
+    with _JOBS_LOCK:
+        j = JOBS.get(job_id)
+        if not j:
+            abort(404)
+        return jsonify({"status": j["status"], "stage": j.get("stage", 0),
+                        "detail": j.get("detail", ""),
+                        "error": j.get("error"),
+                        "events": [e for e in j["events"] if e["seq"] >= since]})
 
 
 @app.route("/generate/job/<job_id>/download")
