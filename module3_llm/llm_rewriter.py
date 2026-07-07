@@ -35,10 +35,18 @@ def load_template(mutation_class: str) -> str:
 
 def make_import_hint(mutant: dict, subject_subdir: str) -> str:
     """Best-effort import line for the function under test. The generated test
-    runs from the subject repo root, so the module path mirrors the file path."""
+    runs from the subject repo root, so the module path mirrors the file path.
+
+    For METHODS (qualname like 'FilesArray.get_dict') the importable symbol is
+    the CLASS, not the method — `from mod import get_dict` would be a
+    guaranteed ImportError and every such test would be INVALID regardless of
+    model quality (a real bug we shipped and then measured)."""
     mod = mutant["file"].removesuffix(".py").replace("/", ".")
-    func = mutant["function"].split(".")[-1]
-    return f"from {mod} import {func}"
+    parts = mutant["function"].split(".")
+    if len(parts) > 1:
+        return (f"from {mod} import {parts[0]}  "
+                f"# then exercise the method {mutant['function']}()")
+    return f"from {mod} import {parts[0]}"
 
 
 def format_context_section(context_chunks: list[dict] | None) -> str:

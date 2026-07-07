@@ -42,8 +42,13 @@ def phase_generate(cfg, args, client):
     from module4_eval.validator import audit_results
 
     mutants = schema.load_mutants(resolve(cfg, cfg["output"]["surviving_mutants"]))
-    if args.limit:
-        mutants = mutants[:args.limit]
+    if args.limit and args.limit < len(mutants):
+        # Deterministic random sample, NOT mutants[:limit]: the head of the
+        # list is alphabetical by file, so small probes used to land entirely
+        # on one file's worst-case code (e.g. external_sort's I/O classes)
+        # and measure the subject's pathology instead of the model.
+        import random
+        mutants = random.Random(42).sample(mutants, args.limit)
     print(f"[pipeline] generating tests for {len(mutants)} mutants")
 
     all_results = []
