@@ -130,6 +130,22 @@ A guard refuses to run mutation phases outside a fork-capable Linux kernel
 and tells you to switch to a WSL2 terminal instead of letting mutmut die with
 a cryptic fork error.
 
+## Generating tests for your own code
+
+Beyond the research experiment, `generate_tests.py` wraps the same pipeline
+as a single-file test generator: provide one Python file and a description of
+what it does, get back a pytest file where every test is validated (passes on
+your code, fails on a specific injected bug):
+
+    python generate_tests.py --file mymodule.py \
+        --description "what this code does" --limit 15 --skip-semantic
+
+Output lands in `generated_test_suites/` (a merged `test_*_generated.py` plus
+a JSON report suitable for driving a future UI). Constraints: pure Python,
+deterministic, no required file/network I/O in the functions under test. Also
+importable programmatically: `from generate_tests import
+generate_tests_for_file`.
+
 ## Repository layout
 
     config.yaml               repo paths, k values, provider + model, caps
