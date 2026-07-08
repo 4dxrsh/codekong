@@ -17,3 +17,5 @@ module1_mutation/_scratch/
 generated_test_suites/
 subjects/user_*/
 frontend/uploads/
+*.zip
+*.tar.gz
