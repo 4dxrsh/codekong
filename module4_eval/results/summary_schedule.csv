@@ -1,0 +1,5 @@
+condition,mutation_class,n,kills,kill_rate,valid_test_rate,retry_rate,first_attempt_kill_rate,mean_wall_seconds,mutation_score_delta
+NO_RAG,higher_order,1,0,0.0,0.0,1.0,0.0,67.9,0.0
+NO_RAG,sdl,5,0,0.0,0.0,1.0,0.0,35.156,0.0
+RAG,higher_order,3,0,0.0,0.0,1.0,0.0,81.95333333333333,0.0
+RAG,sdl,15,0,0.0,0.0,1.0,0.0,38.574,0.0

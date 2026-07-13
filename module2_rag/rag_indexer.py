@@ -10,10 +10,60 @@ embeddings, metadatas), collection.query(query_embeddings, n_results, where).
 """
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 from core.config import resolve
 from core.srcmap import extract_functions
+
+
+def module_constant_chunks(repo: Path, subdir: str):
+    """Yield (file, qualname, text) chunks for MODULE-LEVEL constants/config.
+
+    The AST function walk indexes functions/classes only, so a module that is
+    just a table of constants (rates, thresholds, lookup dicts — a codebase's
+    'source of truth') was invisible to retrieval. Any test whose correctness
+    depends on such a value could never be helped by RAG. This surfaces those
+    module-level assignments (with the module docstring for context) as their
+    own retrievable chunks.
+    """
+    base = repo / subdir if subdir else repo
+    for py in sorted(base.rglob("*.py")):
+        try:
+            src = py.read_text(encoding="utf-8")
+            tree = ast.parse(src)
+        except (SyntaxError, UnicodeDecodeError):
+            continue
+        lines = src.splitlines()
+        rel = py.relative_to(repo).as_posix()
+        mod_doc = (ast.get_docstring(tree) or "").replace("\n", " ")
+        # ONE chunk PER module-level constant so each embeds near queries about
+        # that specific value (a single blob of every table embeds too diffusely
+        # to be retrieved for any one of them).
+        for node in tree.body:
+            if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+                continue
+            seg = ast.get_source_segment(src, node)
+            if not seg:
+                continue
+            targets = (node.targets if isinstance(node, ast.Assign)
+                       else [node.target])
+            names = [t.id for t in targets if isinstance(t, ast.Name)]
+            if not names:
+                continue
+            # pull the comment block immediately above the assignment (it
+            # describes what the constant means — key retrieval signal).
+            comment, i = [], node.lineno - 2
+            while i >= 0 and lines[i].strip().startswith("#"):
+                comment.insert(0, lines[i].strip().lstrip("#").strip())
+                i -= 1
+            desc = " ".join(comment)
+            name = names[0]
+            text = (f"{rel} defines constant {name}"
+                    + (f" — {desc}" if desc else "")
+                    + (f" (from module: {mod_doc[:100]})" if mod_doc else "")
+                    + f"\n{seg}")
+            yield rel, f"const:{name}", text
 
 
 def _lazy_imports():
@@ -44,13 +94,13 @@ def build_index(cfg: dict, subject_key: str) -> int:
         ids.append(f"{fi.file}::{fi.qualname}::{kind}")
         docs.append(fi.source)
         metas.append({"file": fi.file, "qualname": fi.qualname, "kind": kind,
-                      "name": fi.name, "lineno": fi.lineno})
+                      "name": fi.name, "symbol": fi.name, "lineno": fi.lineno})
         if fi.docstring:
             ids.append(f"{fi.file}::{fi.qualname}::docstring")
             docs.append(f"{fi.qualname}: {fi.docstring}")
             metas.append({"file": fi.file, "qualname": fi.qualname,
                           "kind": "docstring", "name": fi.name,
-                          "lineno": fi.lineno})
+                          "symbol": fi.name, "lineno": fi.lineno})
     # For subjects whose tests live outside subdir (e.g. dbader/schedule's
     # test_schedule.py at repo root), index root-level test files too.
     if subdir:
@@ -63,6 +113,17 @@ def build_index(cfg: dict, subject_key: str) -> int:
                     metas.append({"file": fi.file, "qualname": fi.qualname,
                                   "kind": "test", "name": fi.name,
                                   "lineno": fi.lineno})
+
+    # Module-level constants/config (rates, thresholds, lookup tables) — the
+    # 'source of truth' values a function references but doesn't itself contain.
+    for rel, qual, text in module_constant_chunks(repo, subdir):
+        cid = f"{rel}::{qual}::constants"
+        if cid not in ids:
+            ids.append(cid)
+            docs.append(text)
+            metas.append({"file": rel, "qualname": qual, "kind": "constants",
+                          "name": qual, "symbol": qual.split(":", 1)[-1],
+                          "lineno": 0})
 
     if not ids:
         raise RuntimeError(f"No chunks extracted from {repo}/{subdir} — wrong "

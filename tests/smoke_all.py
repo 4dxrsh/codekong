@@ -376,12 +376,25 @@ def test_metrics_and_figures():
 # ------------------------------------------------ misc core
 def test_core_misc():
     from core.hardware import recommend_model
-    from core.guards import assert_fork_capable_linux
+    from core.guards import assert_fork_capable_linux, EnvironmentGuardError
     from core.srcmap import extract_functions
     from core.config import load_config
     hw = recommend_model()
     assert hw["recommended_model"].startswith("qwen")
-    assert_fork_capable_linux()  # sandbox is Linux; must not raise
+    # The fork guard's contract is platform-specific: it MUST refuse native
+    # Windows (no fork(), so mutmut can never run) and MUST allow Linux/macOS.
+    # Assert the correct behavior for whatever OS is running this suite, so the
+    # offline smoke suite is green on the Windows dev laptop and on the
+    # Linux/mac run hosts alike — a hard-coded "must not raise" is wrong on
+    # Windows and made this check fail there for reasons unrelated to the code.
+    if sys.platform.startswith("win"):
+        try:
+            assert_fork_capable_linux()
+            raise AssertionError("fork guard must refuse native Windows")
+        except EnvironmentGuardError:
+            pass
+    else:
+        assert_fork_capable_linux()  # Linux/macOS: must not raise
     cfg = load_config()
     assert cfg["llm"]["provider"] == "local"
     with tempfile.TemporaryDirectory() as td:
@@ -411,4 +424,3 @@ if __name__ == "__main__":
             print(f"[smoke] FAILED: {t.__name__}: {exc}")
     print(f"\n[smoke] {len(ALL) - failed}/{len(ALL)} passed")
     sys.exit(1 if failed else 0)
-# end of smoke suite

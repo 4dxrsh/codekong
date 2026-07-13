@@ -22,6 +22,19 @@ def _read_json(path: Path):
         return None
 
 
+def resolve_test_file(tf, project_root) -> Path | None:
+    """Records may store an absolute path from the machine the run happened on
+    (e.g. a WSL /home/... path). Fall back to the same-named file in this repo's
+    generated_tests/ so the UI can still show the real test."""
+    if not tf:
+        return None
+    p = Path(tf)
+    if p.exists():
+        return p
+    cand = Path(project_root) / "module3_llm" / "generated_tests" / p.name
+    return cand if cand.exists() else None
+
+
 def load_corpus(cfg: dict | None = None) -> dict:
     """Everything the UI needs, from disk, every call (cheap at this scale)."""
     cfg = cfg or load_config()
@@ -117,6 +130,91 @@ def rq_chart_data(results_dir: Path) -> dict:
                          if kill_n else None})
         out["rq4"] = {"rows": rows}
     return out
+
+
+# ------------------------------------------------- results overview (real)
+SUBJECT_META = {
+    "ctxlib": ("Context-dependent code",
+               "Functions whose correct answer depends on constants and helpers "
+               "defined elsewhere in the codebase — exactly where a memory of "
+               "the code should help."),
+    "sorts_focused": ("Self-contained code",
+               "Simple sorting algorithms that need no outside facts — where "
+               "retrieval has nothing extra to offer."),
+    "schedule": ("Complex stateful code",
+               "An object-oriented scheduling library the small local model "
+               "struggles to write valid tests for at all."),
+}
+_SUBJ_ORDER = {"ctxlib": 0, "sorts_focused": 1, "schedule": 2}
+
+
+def results_overview(results_dir: Path) -> dict | None:
+    """Per-subject RQ1-RQ4 computed from the real raw_*.csv / cost_*.csv.
+    Returns None when no run data exists yet (page shows an empty state)."""
+    df = raw_frames(results_dir)
+    if df is None or df.empty:
+        return None
+
+    def kr(sub):
+        g = sub.groupby("condition")["killed"].mean()
+        return (float(g.get("NO_RAG", float("nan"))),
+                float(g.get("RAG", float("nan"))))
+
+    def r3(x):
+        return None if x != x else round(x, 3)   # NaN-safe round
+
+    subjects = []
+    for subj in df.subject.unique():
+        s = df[df.subject == subj]
+        no, rag = kr(s)
+        label, desc = SUBJECT_META.get(subj, (subj, ""))
+        subjects.append({"key": subj, "label": label, "desc": desc,
+                         "n": int(s["mutant_id"].nunique()),
+                         "norag": r3(no), "rag": r3(rag),
+                         "delta": r3(rag - no)})
+    subjects.sort(key=lambda x: _SUBJ_ORDER.get(x["key"], 9))
+    no_c, rag_c = kr(df)
+    combined = {"norag": r3(no_c), "rag": r3(rag_c),
+                "n": int(df["mutant_id"].nunique())}
+
+    base_key = "ctxlib" if "ctxlib" in df["subject"].values else subjects[0]["key"]
+    base = df[df.subject == base_key]
+    base_label = SUBJECT_META.get(base_key, (base_key, ""))[0]
+
+    g2 = (base.groupby(["mutation_class", "condition"])["killed"].mean()
+              .unstack("condition"))
+    classes = [c for c in CLASS_ORDER if c in g2.index]
+    rq2 = {"subject_label": base_label,
+           "classes": [CLASS_LABEL[c] for c in classes],
+           "norag": [r3(float(g2.loc[c].get("NO_RAG", float("nan")))) for c in classes],
+           "rag": [r3(float(g2.loc[c].get("RAG", float("nan")))) for c in classes]}
+
+    rq3 = {}
+    ragk = base[(base["condition"] == "RAG") & base["k"].notna()]
+    if not ragk.empty:
+        g3 = ragk.groupby("k")["valid_test"].mean()
+        nov = float(base[base["condition"] == "NO_RAG"]["valid_test"].mean())
+        rq3 = {"subject_label": base_label, "k": [int(k) for k in g3.index],
+               "valid": [r3(float(v)) for v in g3.values], "norag_valid": r3(nov)}
+
+    rq4 = {}
+    cost_path = results_dir / f"cost_{base_key}.csv"
+    if cost_path.exists():
+        import pandas as pd
+        c = pd.read_csv(cost_path)
+        c["tokens"] = (c.get("total_eval_tokens", 0).fillna(0)
+                       + c.get("total_prompt_tokens", 0).fillna(0))
+        tok = c.groupby("condition")["tokens"].sum()
+        kills = base.groupby("condition")["killed"].sum()
+        rows = []
+        for cond in ("NO_RAG", "RAG"):
+            k = int(kills.get(cond, 0)); t = int(tok.get(cond, 0))
+            rows.append({"condition": cond, "tokens": t, "kills": k,
+                         "per_kill": round(t / k) if k else None})
+        rq4 = {"subject_label": base_label, "rows": rows}
+
+    return {"subjects": subjects, "combined": combined,
+            "rq2": rq2, "rq3": rq3, "rq4": rq4}
 
 
 # ------------------------------------------------------------ code visuals
@@ -222,9 +320,9 @@ def mutant_detail(corpus: dict, mutant_id: str) -> dict | None:
     for r in recs:
         for v in r.get("validation", []):
             test_code = None
-            tf = r.get("test_file")
-            if tf and Path(tf).exists():
-                test_code = Path(tf).read_text(encoding="utf-8")[:2000]
+            tf = resolve_test_file(r.get("test_file"), corpus["cfg"]["_project_root"])
+            if tf:
+                test_code = tf.read_text(encoding="utf-8")[:2000]
             tests.append({"condition": r["condition"], "k": r.get("k"),
                           "attempt": v.get("attempt"),
                           "passed": v.get("status") == "PASS",
@@ -243,18 +341,37 @@ def mutant_detail(corpus: dict, mutant_id: str) -> dict | None:
     return detail
 
 
+_MUT_CLASSES = {"sdl", "semantic", "syntactic"}
+
+
+def _function_of(mutant_id: str) -> str:
+    """Best-effort readable function name from a mutant id like
+    'sdl_is_passing_7b1ae0c8' -> 'is_passing'."""
+    parts = mutant_id.split("_")
+    if parts and parts[0] in _MUT_CLASSES:
+        parts = parts[1:]
+    elif len(parts) >= 2 and parts[0] == "higher" and parts[1] == "order":
+        parts = parts[2:]
+    if (parts and len(parts[-1]) >= 6
+            and all(ch in "0123456789abcdef" for ch in parts[-1])):
+        parts = parts[:-1]
+    return "_".join(parts) or mutant_id
+
+
 def passed_test_rows(corpus: dict) -> list[dict]:
     rows = []
     for r in corpus["records"]:
         if not r.get("valid_test_produced"):
             continue
-        tf = r.get("test_file")
-        snippet = ""
-        if tf and Path(tf).exists():
-            snippet = Path(tf).read_text(encoding="utf-8")[:800]
+        tf = resolve_test_file(r.get("test_file"), corpus["cfg"]["_project_root"])
+        snippet = tf.read_text(encoding="utf-8")[:1400] if tf else ""
         rows.append({"mutant_id": r["mutant_id"], "subject": r.get("subject"),
+                     "function": _function_of(r["mutant_id"]),
                      "mutation_class": r["mutation_class"],
                      "condition": r["condition"], "k": r.get("k"),
                      "killed": r["status"] == "KILLED",
                      "origin": "generated", "snippet": snippet})
+    # caught bugs first, retrieval-condition first (the compelling cases), then subject
+    rows.sort(key=lambda r: (not r["killed"], r["condition"] != "RAG",
+                             r["subject"] or "", r["function"]))
     return rows

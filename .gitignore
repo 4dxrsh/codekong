@@ -8,6 +8,8 @@ module3_llm/generated_tests/*.pyc
 module3_llm/llm_calls.jsonl
 subjects/*/
 !subjects/pins.json
+!subjects/ctxlib/
+!subjects/ctxlib/**
 mutants/
 .mutmut-cache
 .pytest_cache/
@@ -19,3 +21,4 @@ subjects/user_*/
 frontend/uploads/
 *.zip
 *.tar.gz
+.claude/settings.local.json

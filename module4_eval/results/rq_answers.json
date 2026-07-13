@@ -1,0 +1,50 @@
+{
+  "RQ1": {
+    "kill_rate_rag": 0.5299145299145299,
+    "kill_rate_norag": 0.1282051282051282,
+    "rag_wins_overall": true
+  },
+  "RQ2": {
+    "classes": [
+      "semantic",
+      "higher_order"
+    ],
+    "deltas": [
+      0.2564102564102564,
+      0.7333333333333333
+    ],
+    "gradient_holds": true,
+    "note": "Report honestly either way; an inconclusive gradient is a finding, not a failure."
+  },
+  "RQ3_valid_test_rate_by_k": {
+    "3": 0.6923076923076923,
+    "5": 0.6923076923076923,
+    "8": 0.6410256410256411
+  },
+  "delta_table": [
+    {
+      "mutation_class": "sdl",
+      "mean_NO_RAG": 0.09523809523809523,
+      "mean_RAG": 0.5079365079365079,
+      "count_NO_RAG": 21.0,
+      "count_RAG": 63.0,
+      "rag_delta": 0.4126984126984127
+    },
+    {
+      "mutation_class": "semantic",
+      "mean_NO_RAG": 0.23076923076923078,
+      "mean_RAG": 0.48717948717948717,
+      "count_NO_RAG": 13.0,
+      "count_RAG": 39.0,
+      "rag_delta": 0.2564102564102564
+    },
+    {
+      "mutation_class": "higher_order",
+      "mean_NO_RAG": 0.0,
+      "mean_RAG": 0.7333333333333333,
+      "count_NO_RAG": 5.0,
+      "count_RAG": 15.0,
+      "rag_delta": 0.7333333333333333
+    }
+  ]
+}

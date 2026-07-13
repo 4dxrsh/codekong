@@ -43,6 +43,20 @@ agentic:
   max_retries: 1                      # exactly one retry with validator feedback
 
 subjects:
+  ctxlib:
+    url: ""
+    path: subjects/ctxlib
+    subdir: ""
+    test_selection: ["test_ctxlib.py"]
+    pytest_extra_args: []
+    pin_commit: ""
+  sorts_focused:
+    url: ""
+    path: subjects/sorts_focused
+    subdir: ""
+    test_selection: ["."]
+    pytest_extra_args: ["--doctest-modules"]
+    pin_commit: ""
   sorts:
     url: https://github.com/TheAlgorithms/Python
     path: subjects/algorithms_python

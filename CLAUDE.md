@@ -87,12 +87,12 @@ paper/codekong_notes.md as a threat to validity.
 
 ## Current state / open work (update this section as you go)
 
-- Model-tier question OPEN: qwen2.5-coder:7b on the original 4GB-VRAM laptop
-  had not yet demonstrated kills at last update. Capability probe:
-  `python generate_tests.py --file demo_range_utils.py --description
-  "numeric utilities" --limit 8 --skip-semantic` (kills>0 = model OK), then
+- Model-tier question RESOLVED (2026-07-09): qwen2.5-coder:7b killed 8/8 on
+  the capability probe (`python generate_tests.py --file demo_range_utils.py
+  --description "numeric range utilities" --limit 8 --skip-semantic --no-rag`)
+  on the Windows dev box. Config stays at qwen2.5-coder:7b; no need for 14b.
+  Re-run that probe (kills>0 = model OK) if moving to different hardware, then
   `python run_pipeline.py --repo sorts --phase generate --limit 25`.
-  If demo-file kills are zero, move config.yaml to qwen2.5-coder:14b.
 - Full research runs (both subjects, both conditions, k sweep) not yet
   executed -> Research Questions page shows empty states until then.
 - frontend/app.py ABOUT template has placeholder sections (marked # EDIT

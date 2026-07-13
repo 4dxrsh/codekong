@@ -20,7 +20,7 @@ Ties into the existing architecture rather than duplicating it:
   curation      -> only KILLED tests are merged into the output file; each is
                    provably a real regression test, not plausible-looking noise
 
-Programmatic use (frontend: call this, poll the returned report):
+Programmatic use (future frontend: call this, poll the returned report):
     from generate_tests import generate_tests_for_file
     report = generate_tests_for_file("mymodule.py", "what it does", limit=15)
 """

@@ -11,6 +11,8 @@ Query construction per class (the design's hardness-aware strategy):
 """
 from __future__ import annotations
 
+import ast
+
 from core.config import resolve
 from module2_rag.rag_indexer import collection_name, _lazy_imports
 
@@ -42,6 +44,44 @@ class Retriever:
                     f"{func}\n{mutant['diff']}"]
         raise ValueError(f"unknown mutation_class {mc!r}")
 
+    # ---------------------------------------------- dependency-aware retrieval
+    @staticmethod
+    def referenced_symbols(mutant: dict) -> set[str]:
+        """Names the function-under-test READS but does not define locally —
+        the constants, lookup tables and helper functions whose definitions
+        live elsewhere. These are exactly what closed-book generation is missing
+        and what retrieval must supply, so we fetch their definitions directly
+        instead of hoping code-similarity surfaces them."""
+        try:
+            tree = ast.parse(mutant.get("original_code", ""))
+        except (SyntaxError, ValueError):
+            return set()
+        assigned, refs = set(), set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.arg):
+                assigned.add(node.arg)
+            elif isinstance(node, ast.Name):
+                (assigned if isinstance(node.ctx, ast.Store) else refs).add(node.id)
+            elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                refs.add(node.func.id)
+        refs -= assigned
+        refs.discard(mutant.get("function", "").split(".")[-1])
+        return {r for r in refs if not r.startswith("__")}
+
+    def _fetch_definitions(self, symbols: set[str]) -> list[dict]:
+        if not symbols:
+            return []
+        try:
+            got = self._coll.get(where={"symbol": {"$in": list(symbols)}})
+        except Exception:
+            return []
+        out = []
+        for cid, doc, meta in zip(got.get("ids", []), got.get("documents", []),
+                                  got.get("metadatas", [])):
+            out.append({"id": cid, "document": doc, "metadata": meta,
+                        "distance": 0.0})  # a depended-on definition ranks first
+        return out
+
     # ------------------------------------------------------------ retrieval
     def retrieve(self, mutant: dict, k: int) -> list[dict]:
         queries = self.build_queries(mutant)
@@ -50,6 +90,10 @@ class Retriever:
         res = self._coll.query(query_embeddings=embeddings,
                                n_results=per_query_k)
         merged: dict[str, dict] = {}
+        # Dependency-aware seeds first: definitions of the symbols the function
+        # references (constants/tables/helpers), guaranteed into the candidate set.
+        for c in self._fetch_definitions(self.referenced_symbols(mutant)):
+            merged[c["id"]] = c
         for qi in range(len(queries)):
             for cid, doc, meta, dist in zip(res["ids"][qi], res["documents"][qi],
                                             res["metadatas"][qi],
@@ -57,14 +101,13 @@ class Retriever:
                 if cid not in merged or dist < merged[cid]["distance"]:
                     merged[cid] = {"id": cid, "document": doc,
                                    "metadata": meta, "distance": dist}
-        chunks = sorted(merged.values(), key=lambda c: c["distance"])[:k]
-        # Never hand the model the mutant's own function verbatim as "context"
-        # for free — it is already in the prompt. Drop exact-self chunks.
-        chunks = [c for c in chunks
-                  if not (c["metadata"].get("qualname") == mutant["function"]
-                          and c["metadata"].get("file") == mutant["file"]
-                          and c["metadata"].get("kind") == "function")]
-        return chunks
+        # Drop the mutant's own function verbatim (already in the prompt), then
+        # keep the k nearest (depended-on definitions sort to the front).
+        candidates = [c for c in merged.values()
+                      if not (c["metadata"].get("qualname") == mutant["function"]
+                              and c["metadata"].get("file") == mutant["file"]
+                              and c["metadata"].get("kind") == "function")]
+        return sorted(candidates, key=lambda c: c["distance"])[:k]
 
 
 def retrieve_for_mutants(cfg: dict, subject_key: str, mutants: list[dict],

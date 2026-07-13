@@ -1,0 +1,2181 @@
+[
+  {
+    "mutant_id": "sdl_gnome_sort_5a57f34248",
+    "mutation_class": "sdl",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 19.18,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_5a57f34248_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_a02a064057",
+    "mutation_class": "sdl",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 38.03,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_a02a064057_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+    "mutation_class": "sdl",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_no_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_no_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_no_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_no_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 15.55,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_Comparable.__lt___7ca835aacc_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+    "mutation_class": "semantic",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 91.32,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_cocktail_shaker_sort_7a19a21262_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "semantic_heap_sort_2e040db62c",
+    "mutation_class": "semantic",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_heap_sort_2e040db62c",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on [0, 5, 3, 2, 2] | assert [2, 2, 3, 5, 0] == [0, 2, 2, 3, 5] | E         At index 0 diff: 2 != 0 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_heap_sort_2e040db62c_no_rag.py::test_heap_sort",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 32.05,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_heap_sort_2e040db62c_NO_RAG_a1.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+    "mutation_class": "semantic",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_no_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_no_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_no_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_no_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 47.51,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_Comparable.__lt___7c47b8341e_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "semantic_insertion_sort_5acbd41981",
+    "mutation_class": "semantic",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_insertion_sort_5acbd41981",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on negative numbers | assert [-2, -5, -45] == [-45, -5, -2] | E         At index 0 diff: -2 != -45 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_insertion_sort_5acbd41981_no_rag.py::test_insertion_sort",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 23.52,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_insertion_sort_5acbd41981_NO_RAG_a1.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+    "mutation_class": "semantic",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_no_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_no_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_no_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_no_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 78.39,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_merge_sort.merge_efcd3e7311_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "semantic_selection_sort_8c56e12767",
+    "mutation_class": "semantic",
+    "condition": "NO_RAG",
+    "k": null,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 44.26,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_selection_sort_8c56e12767_NO_RAG_a2.py",
+    "context_chunks": []
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_5a57f34248",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 16.93,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_5a57f34248_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 0.8868353962898254,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.1430044174194336,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_a02a064057",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 40.99,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_a02a064057_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 0.932569146156311,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.2274444103240967,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 15.6,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_Comparable.__lt___7ca835aacc_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 1.2267647981643677,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "gnome_sort.py::gnome_sort::function",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "function",
+        "distance": 1.2507340908050537,
+        "snippet": "def gnome_sort(lst: list) -> list:\n    \"\"\"\n    Pure implementation of the gnome sort algorithm in Python\n\n    Take some mutable ordered collection with heterogeneous comparable items inside as\n    arguments, return the same collection ordered by ascending.\n\n    Examples:\n    >>> gnome_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n\n    >>> gnome_sort([])\n    []\n\n    >>> gnome_sort([-2, -5, -45])\n    [-"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 64.0,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_cocktail_shaker_sort_7a19a21262_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "cocktail_shaker_sort.py::cocktail_shaker_sort::docstring",
+        "file": "cocktail_shaker_sort.py",
+        "qualname": "cocktail_shaker_sort",
+        "kind": "docstring",
+        "distance": 0.1338183730840683,
+        "snippet": "cocktail_shaker_sort: Sorts a list using the Cocktail Shaker Sort algorithm.\n\n:param arr: List of elements to be sorted.\n:return: Sorted list.\n\n>>> cocktail_shaker_sort([4, 5, 2, 1, 2])\n[1, 2, 2, 4, 5]\n>>> cocktail_shaker_sort([-4, 5, 0, 1, 2, 11])\n[-4, 0, 1, 2, 5, 11]\n>>> cocktail_shaker_sort([0.1, -2.4, 4.4, 2.2])\n[-2.4, 0.1, 2.2, 4.4]\n>>> cocktail_shaker_sort([1, 2, 3, 4, 5])\n[1, 2, 3, 4, 5]\n>>"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.7327963709831238,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_heap_sort_2e040db62c",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_heap_sort_2e040db62c",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on [0, 5, 3, 2, 2] | assert [2, 2, 3, 5, 0] == [0, 2, 2, 3, 5] | E         At index 0 diff: 2 != 0 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_heap_sort_2e040db62c_rag.py::test_heap_sort - A...",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 43.19,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_heap_sort_2e040db62c_RAG_a1.py",
+    "context_chunks": [
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 0.10100634396076202,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 0.4506267011165619,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 56.37,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_Comparable.__lt___7c47b8341e_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 1.3634114265441895,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 1.395697832107544,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_insertion_sort_5acbd41981",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_insertion_sort_5acbd41981",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on negative integers | assert [-2, -5, -45] == [-45, -5, -2] | E         At index 0 diff: -2 != -45 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_insertion_sort_5acbd41981_rag.py::test_insertion_sort",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 30.25,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_insertion_sort_5acbd41981_RAG_a1.py",
+    "context_chunks": [
+      {
+        "id": "insertion_sort.py::insertion_sort::docstring",
+        "file": "insertion_sort.py",
+        "qualname": "insertion_sort",
+        "kind": "docstring",
+        "distance": 0.2837653160095215,
+        "snippet": "insertion_sort: A pure Python implementation of the insertion sort algorithm\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered by ascending\n\nExamples:\n>>> insertion_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> insertion_sort([]) == sorted([])\nTrue\n>>> insertion_sort([-2, -5, -45]) == sorted([-2, -5, -45])\nTrue\n>>> inser"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.6386675238609314,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 82.2,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_merge_sort.merge_efcd3e7311_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "merge_sort.py::merge_sort::function",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "function",
+        "distance": 0.2156042605638504,
+        "snippet": "def merge_sort(collection: list) -> list:\n    \"\"\"\n    Sorts a list using the merge sort algorithm.\n\n    :param collection: A mutable ordered collection with comparable items.\n    :return: The same collection ordered in ascending order.\n\n    Time Complexity: O(n log n)\n    Space Complexity: O(n)\n\n    Examples:\n    >>> merge_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> merge_sort([])\n    []\n   "
+      },
+      {
+        "id": "merge_sort.py::merge_sort.merge::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort.merge",
+        "kind": "docstring",
+        "distance": 0.31592315435409546,
+        "snippet": "merge_sort.merge: Merge two sorted lists into a single sorted list.\n\n:param left: Left collection\n:param right: Right collection\n:return: Merged result"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_selection_sort_8c56e12767",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 3,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 45.53,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_selection_sort_8c56e12767_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "selection_sort.py::selection_sort::docstring",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "docstring",
+        "distance": 0.5876479148864746,
+        "snippet": "selection_sort: Sorts a list in ascending order using the selection sort algorithm.\n\n:param collection: A list of integers to be sorted.\n:return: The sorted list.\n\nExamples:\n>>> selection_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> selection_sort([])\n[]\n\n>>> selection_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.6371151804924011,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_5a57f34248",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 17.82,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_5a57f34248_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 0.8868353962898254,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.1430044174194336,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 1.1616129875183105,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      },
+      {
+        "id": "selection_sort.py::selection_sort::function",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "function",
+        "distance": 1.2443760633468628,
+        "snippet": "def selection_sort(collection: list[int]) -> list[int]:\n    \"\"\"\n    Sorts a list in ascending order using the selection sort algorithm.\n\n    :param collection: A list of integers to be sorted.\n    :return: The sorted list.\n\n    Examples:\n    >>> selection_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n\n    >>> selection_sort([])\n    []\n\n    >>> selection_sort([-2, -5, -45])\n    [-45, -5, -2]\n    \"\"\"\n\n "
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_a02a064057",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 43.08,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_a02a064057_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 0.932569146156311,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.2274444103240967,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "merge_sort.py::merge_sort.merge::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort.merge",
+        "kind": "docstring",
+        "distance": 1.2556604146957397,
+        "snippet": "merge_sort.merge: Merge two sorted lists into a single sorted list.\n\n:param left: Left collection\n:param right: Right collection\n:return: Merged result"
+      },
+      {
+        "id": "selection_sort.py::selection_sort::docstring",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "docstring",
+        "distance": 1.3129212856292725,
+        "snippet": "selection_sort: Sorts a list in ascending order using the selection sort algorithm.\n\n:param collection: A list of integers to be sorted.\n:return: The sorted list.\n\nExamples:\n>>> selection_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> selection_sort([])\n[]\n\n>>> selection_sort([-2, -5, -45])\n[-45, -5, -2]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 16.3,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_Comparable.__lt___7ca835aacc_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 1.2267647981643677,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "gnome_sort.py::gnome_sort::function",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "function",
+        "distance": 1.2507340908050537,
+        "snippet": "def gnome_sort(lst: list) -> list:\n    \"\"\"\n    Pure implementation of the gnome sort algorithm in Python\n\n    Take some mutable ordered collection with heterogeneous comparable items inside as\n    arguments, return the same collection ordered by ascending.\n\n    Examples:\n    >>> gnome_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n\n    >>> gnome_sort([])\n    []\n\n    >>> gnome_sort([-2, -5, -45])\n    [-"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 1.268687129020691,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_recursive::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_recursive",
+        "kind": "function",
+        "distance": 1.2778217792510986,
+        "snippet": "def bubble_sort_recursive(collection: list[Any]) -> list[Any]:\n    \"\"\"It is similar iterative bubble sort but recursive.\n\n    :param collection: mutable ordered sequence of elements\n    :return: the same list in ascending order\n\n    Examples:\n    >>> bubble_sort_recursive([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_recursive([])\n    []\n    >>> bubble_sort_recursive([-2, -45, -5])\n    "
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 85.43,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_cocktail_shaker_sort_7a19a21262_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "cocktail_shaker_sort.py::cocktail_shaker_sort::docstring",
+        "file": "cocktail_shaker_sort.py",
+        "qualname": "cocktail_shaker_sort",
+        "kind": "docstring",
+        "distance": 0.1338183730840683,
+        "snippet": "cocktail_shaker_sort: Sorts a list using the Cocktail Shaker Sort algorithm.\n\n:param arr: List of elements to be sorted.\n:return: Sorted list.\n\n>>> cocktail_shaker_sort([4, 5, 2, 1, 2])\n[1, 2, 2, 4, 5]\n>>> cocktail_shaker_sort([-4, 5, 0, 1, 2, 11])\n[-4, 0, 1, 2, 5, 11]\n>>> cocktail_shaker_sort([0.1, -2.4, 4.4, 2.2])\n[-2.4, 0.1, 2.2, 4.4]\n>>> cocktail_shaker_sort([1, 2, 3, 4, 5])\n[1, 2, 3, 4, 5]\n>>"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.7327963709831238,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.7570443749427795,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::docstring",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "docstring",
+        "distance": 0.7759010791778564,
+        "snippet": "bubble_sort_iterative: Pure implementation of bubble sort algorithm in Python\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> bubble_sort_iterative([0, 5, 2, 3, 2])\n[0, 2, 2, 3, 5]\n>>> bubble_sort_iterative([])\n[]\n>>> bubble_sort_iterative([-2, -45, -5])\n[-45, -5, -2]\n>>> bubble_so"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_heap_sort_2e040db62c",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_heap_sort_2e040db62c",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on [0, 5, 3, 2, 2] | assert [2, 2, 3, 5, 0] == [0, 2, 2, 3, 5] | E         At index 0 diff: 2 != 0 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_heap_sort_2e040db62c_rag.py::test_heap_sort - A...",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 41.26,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_heap_sort_2e040db62c_RAG_a1.py",
+    "context_chunks": [
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 0.10100634396076202,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 0.4506267011165619,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 0.47115862369537354,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::docstring",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "docstring",
+        "distance": 0.5431228876113892,
+        "snippet": "bubble_sort_iterative: Pure implementation of bubble sort algorithm in Python\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> bubble_sort_iterative([0, 5, 2, 3, 2])\n[0, 2, 2, 3, 5]\n>>> bubble_sort_iterative([])\n[]\n>>> bubble_sort_iterative([-2, -45, -5])\n[-45, -5, -2]\n>>> bubble_so"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 58.95,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_Comparable.__lt___7c47b8341e_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 1.3634114265441895,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 1.395697832107544,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      },
+      {
+        "id": "shell_sort.py::shell_sort::docstring",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "docstring",
+        "distance": 1.4093648195266724,
+        "snippet": "shell_sort: Pure implementation of shell sort algorithm in Python\n:param collection:  Some mutable ordered collection with heterogeneous\ncomparable items inside\n:return:  the same collection ordered by ascending\n\n>>> shell_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> shell_sort([])\n[]\n>>> shell_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.435657262802124,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_insertion_sort_5acbd41981",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_insertion_sort_5acbd41981",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on negative integers | assert [-2, -5, -45] == [-45, -5, -2] | E         At index 0 diff: -2 != -45 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_insertion_sort_5acbd41981_rag.py::test_insertion_sort",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 36.55,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_insertion_sort_5acbd41981_RAG_a1.py",
+    "context_chunks": [
+      {
+        "id": "insertion_sort.py::insertion_sort::docstring",
+        "file": "insertion_sort.py",
+        "qualname": "insertion_sort",
+        "kind": "docstring",
+        "distance": 0.2837653160095215,
+        "snippet": "insertion_sort: A pure Python implementation of the insertion sort algorithm\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered by ascending\n\nExamples:\n>>> insertion_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> insertion_sort([]) == sorted([])\nTrue\n>>> insertion_sort([-2, -5, -45]) == sorted([-2, -5, -45])\nTrue\n>>> inser"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.6386675238609314,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "shell_sort.py::shell_sort::function",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "function",
+        "distance": 0.6483347415924072,
+        "snippet": "def shell_sort(collection: list[int]) -> list[int]:\n    \"\"\"Pure implementation of shell sort algorithm in Python\n    :param collection:  Some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return:  the same collection ordered by ascending\n\n    >>> shell_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> shell_sort([])\n    []\n    >>> shell_sort([-2, -5, -45])\n    [-45"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.6747101545333862,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 57.43,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_merge_sort.merge_efcd3e7311_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "merge_sort.py::merge_sort::function",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "function",
+        "distance": 0.2156042605638504,
+        "snippet": "def merge_sort(collection: list) -> list:\n    \"\"\"\n    Sorts a list using the merge sort algorithm.\n\n    :param collection: A mutable ordered collection with comparable items.\n    :return: The same collection ordered in ascending order.\n\n    Time Complexity: O(n log n)\n    Space Complexity: O(n)\n\n    Examples:\n    >>> merge_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> merge_sort([])\n    []\n   "
+      },
+      {
+        "id": "merge_sort.py::merge_sort.merge::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort.merge",
+        "kind": "docstring",
+        "distance": 0.31592315435409546,
+        "snippet": "merge_sort.merge: Merge two sorted lists into a single sorted list.\n\n:param left: Left collection\n:param right: Right collection\n:return: Merged result"
+      },
+      {
+        "id": "merge_sort.py::merge_sort::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "docstring",
+        "distance": 0.694145917892456,
+        "snippet": "merge_sort: Sorts a list using the merge sort algorithm.\n\n:param collection: A mutable ordered collection with comparable items.\n:return: The same collection ordered in ascending order.\n\nTime Complexity: O(n log n)\nSpace Complexity: O(n)\n\nExamples:\n>>> merge_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> merge_sort([])\n[]\n>>> merge_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 1.0998046398162842,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_selection_sort_8c56e12767",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 5,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 57.15,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_selection_sort_8c56e12767_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "selection_sort.py::selection_sort::docstring",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "docstring",
+        "distance": 0.5876479148864746,
+        "snippet": "selection_sort: Sorts a list in ascending order using the selection sort algorithm.\n\n:param collection: A list of integers to be sorted.\n:return: The sorted list.\n\nExamples:\n>>> selection_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> selection_sort([])\n[]\n\n>>> selection_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.6371151804924011,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.6505362391471863,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "shell_sort.py::shell_sort::function",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "function",
+        "distance": 0.7358401417732239,
+        "snippet": "def shell_sort(collection: list[int]) -> list[int]:\n    \"\"\"Pure implementation of shell sort algorithm in Python\n    :param collection:  Some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return:  the same collection ordered by ascending\n\n    >>> shell_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> shell_sort([])\n    []\n    >>> shell_sort([-2, -5, -45])\n    [-45"
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_5a57f34248",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_5a57f34248",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 21.17,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_5a57f34248_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 0.8868353962898254,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.1430044174194336,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 1.1616129875183105,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      },
+      {
+        "id": "selection_sort.py::selection_sort::function",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "function",
+        "distance": 1.2443760633468628,
+        "snippet": "def selection_sort(collection: list[int]) -> list[int]:\n    \"\"\"\n    Sorts a list in ascending order using the selection sort algorithm.\n\n    :param collection: A list of integers to be sorted.\n    :return: The sorted list.\n\n    Examples:\n    >>> selection_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n\n    >>> selection_sort([])\n    []\n\n    >>> selection_sort([-2, -5, -45])\n    [-45, -5, -2]\n    \"\"\"\n\n "
+      },
+      {
+        "id": "comb_sort.py::comb_sort::function",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "function",
+        "distance": 1.252344012260437,
+        "snippet": "def comb_sort(data: list) -> list:\n    \"\"\"Pure implementation of comb sort algorithm in Python\n    :param data: mutable collection with comparable items\n    :return: the same collection in ascending order\n    Examples:\n    >>> comb_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> comb_sort([])\n    []\n    >>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n    [-15, -7, 0, 2, 3, 8, 45, 99]\n    \"\"\"\n    sh"
+      },
+      {
+        "id": "heap_sort.py::heap_sort::function",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "function",
+        "distance": 1.2579110860824585,
+        "snippet": "def heap_sort(unsorted: list[int]) -> list[int]:\n    \"\"\"\n    A pure Python implementation of the heap sort algorithm\n\n    :param collection: a mutable ordered collection of heterogeneous comparable items\n    :return: the same collection ordered by ascending\n\n    Examples:\n    >>> heap_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> heap_sort([])\n    []\n    >>> heap_sort([-2, -5, -45])\n    [-45, "
+      },
+      {
+        "id": "merge_sort.py::merge_sort::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "docstring",
+        "distance": 1.2625184059143066,
+        "snippet": "merge_sort: Sorts a list using the merge sort algorithm.\n\n:param collection: A mutable ordered collection with comparable items.\n:return: The same collection ordered in ascending order.\n\nTime Complexity: O(n log n)\nSpace Complexity: O(n)\n\nExamples:\n>>> merge_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> merge_sort([])\n[]\n>>> merge_sort([-2, -5, -45])\n[-45, -5, -2]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_gnome_sort_a02a064057",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_gnome_sort_a02a064057",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 55.66,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_gnome_sort_a02a064057_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 0.932569146156311,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.2274444103240967,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "merge_sort.py::merge_sort.merge::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort.merge",
+        "kind": "docstring",
+        "distance": 1.2556604146957397,
+        "snippet": "merge_sort.merge: Merge two sorted lists into a single sorted list.\n\n:param left: Left collection\n:param right: Right collection\n:return: Merged result"
+      },
+      {
+        "id": "selection_sort.py::selection_sort::docstring",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "docstring",
+        "distance": 1.3129212856292725,
+        "snippet": "selection_sort: Sorts a list in ascending order using the selection sort algorithm.\n\n:param collection: A list of integers to be sorted.\n:return: The sorted list.\n\nExamples:\n>>> selection_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> selection_sort([])\n[]\n\n>>> selection_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "merge_sort.py::merge_sort::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "docstring",
+        "distance": 1.3253519535064697,
+        "snippet": "merge_sort: Sorts a list using the merge sort algorithm.\n\n:param collection: A mutable ordered collection with comparable items.\n:return: The same collection ordered in ascending order.\n\nTime Complexity: O(n log n)\nSpace Complexity: O(n)\n\nExamples:\n>>> merge_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> merge_sort([])\n[]\n>>> merge_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 1.3565821647644043,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "heap_sort.py::heap_sort::function",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "function",
+        "distance": 1.3579764366149902,
+        "snippet": "def heap_sort(unsorted: list[int]) -> list[int]:\n    \"\"\"\n    A pure Python implementation of the heap sort algorithm\n\n    :param collection: a mutable ordered collection of heterogeneous comparable items\n    :return: the same collection ordered by ascending\n\n    Examples:\n    >>> heap_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> heap_sort([])\n    []\n    >>> heap_sort([-2, -5, -45])\n    [-45, "
+      }
+    ]
+  },
+  {
+    "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+    "mutation_class": "sdl",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "sdl_Comparable.__lt___7ca835aacc",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_sdl_Comparable'; pytest: ERROR test_codekong_sdl_Comparable.__lt___7ca835aacc_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 22.66,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/sdl_Comparable.__lt___7ca835aacc_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 1.2267647981643677,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "gnome_sort.py::gnome_sort::function",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "function",
+        "distance": 1.2507340908050537,
+        "snippet": "def gnome_sort(lst: list) -> list:\n    \"\"\"\n    Pure implementation of the gnome sort algorithm in Python\n\n    Take some mutable ordered collection with heterogeneous comparable items inside as\n    arguments, return the same collection ordered by ascending.\n\n    Examples:\n    >>> gnome_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n\n    >>> gnome_sort([])\n    []\n\n    >>> gnome_sort([-2, -5, -45])\n    [-"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 1.268687129020691,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_recursive::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_recursive",
+        "kind": "function",
+        "distance": 1.2778217792510986,
+        "snippet": "def bubble_sort_recursive(collection: list[Any]) -> list[Any]:\n    \"\"\"It is similar iterative bubble sort but recursive.\n\n    :param collection: mutable ordered sequence of elements\n    :return: the same list in ascending order\n\n    Examples:\n    >>> bubble_sort_recursive([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_recursive([])\n    []\n    >>> bubble_sort_recursive([-2, -45, -5])\n    "
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 1.288344383239746,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 1.2884687185287476,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "cocktail_shaker_sort.py::cocktail_shaker_sort::function",
+        "file": "cocktail_shaker_sort.py",
+        "qualname": "cocktail_shaker_sort",
+        "kind": "function",
+        "distance": 1.3029708862304688,
+        "snippet": "def cocktail_shaker_sort(arr: list[int]) -> list[int]:\n    \"\"\"\n    Sorts a list using the Cocktail Shaker Sort algorithm.\n\n    :param arr: List of elements to be sorted.\n    :return: Sorted list.\n\n    >>> cocktail_shaker_sort([4, 5, 2, 1, 2])\n    [1, 2, 2, 4, 5]\n    >>> cocktail_shaker_sort([-4, 5, 0, 1, 2, 11])\n    [-4, 0, 1, 2, 5, 11]\n    >>> cocktail_shaker_sort([0.1, -2.4, 4.4, 2.2])\n    [-2.4"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): assert [0, 2, 2, 3, 5] != [0, 2, 2, 3, 5] | +  where [0, 2, 2, 3, 5] = cocktail_shaker_sort([0, 2, 2, 3, 5]) | +  and   [0, 2, 2, 3, 5] = sorted([0, 5, 2, 3, 2]); pytest: FAILED test_codekong_semantic_cocktail_shaker_sort_7a19a21262_rag.py::test_cocktail_shaker_sort",
+        "failing_assertion": "Failing assertion(s): assert [0, 2, 2, 3, 5] != [0, 2, 2, 3, 5] | +  where [0, 2, 2, 3, 5] = cocktail_shaker_sort([0, 2, 2, 3, 5]) | +  and   [0, 2, 2, 3, 5] = sorted([0, 5, 2, 3, 2]); pytest: FAILED test_codekong_semantic_cocktail_shaker_sort_7a19a21262_rag.py::test_cocktail_shaker_sort",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_cocktail_shaker_sort_7a19a21262",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): AssertionError: Failed on [1, 'a', 3.3] with expected TypeError | assert \"'>' not supp...nt' and 'str'\" == 'Cannot compa...: int and str' | E             - Cannot compare types: int and str | + '>' not supported between instances of 'int' and 'str'; pytest: FAILED test_codekong_semantic_cocktail_shaker_sort_7a19a21262_rag.py::test_cocktail_shaker_sort",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on [1, 'a', 3.3] with expected TypeError | assert \"'>' not supp...nt' and 'str'\" == 'Cannot compa...: int and str' | E             - Cannot compare types: int and str | + '>' not supported between instances of 'int' and 'str'; pytest: FAILED test_codekong_semantic_cocktail_shaker_sort_7a19a21262_rag.py::test_cocktail_shaker_sort",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 152.44,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_cocktail_shaker_sort_7a19a21262_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "cocktail_shaker_sort.py::cocktail_shaker_sort::docstring",
+        "file": "cocktail_shaker_sort.py",
+        "qualname": "cocktail_shaker_sort",
+        "kind": "docstring",
+        "distance": 0.1338183730840683,
+        "snippet": "cocktail_shaker_sort: Sorts a list using the Cocktail Shaker Sort algorithm.\n\n:param arr: List of elements to be sorted.\n:return: Sorted list.\n\n>>> cocktail_shaker_sort([4, 5, 2, 1, 2])\n[1, 2, 2, 4, 5]\n>>> cocktail_shaker_sort([-4, 5, 0, 1, 2, 11])\n[-4, 0, 1, 2, 5, 11]\n>>> cocktail_shaker_sort([0.1, -2.4, 4.4, 2.2])\n[-2.4, 0.1, 2.2, 4.4]\n>>> cocktail_shaker_sort([1, 2, 3, 4, 5])\n[1, 2, 3, 4, 5]\n>>"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.7327963709831238,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.7570443749427795,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::docstring",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "docstring",
+        "distance": 0.7759010791778564,
+        "snippet": "bubble_sort_iterative: Pure implementation of bubble sort algorithm in Python\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> bubble_sort_iterative([0, 5, 2, 3, 2])\n[0, 2, 2, 3, 5]\n>>> bubble_sort_iterative([])\n[]\n>>> bubble_sort_iterative([-2, -45, -5])\n[-45, -5, -2]\n>>> bubble_so"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "function",
+        "distance": 0.7815539240837097,
+        "snippet": "def bubble_sort_iterative(collection: list[Any]) -> list[Any]:\n    \"\"\"Pure implementation of bubble sort algorithm in Python\n\n    :param collection: some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return: the same collection ordered in ascending order\n\n    Examples:\n    >>> bubble_sort_iterative([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_iterative("
+      },
+      {
+        "id": "merge_sort.py::merge_sort::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "docstring",
+        "distance": 0.79945969581604,
+        "snippet": "merge_sort: Sorts a list using the merge sort algorithm.\n\n:param collection: A mutable ordered collection with comparable items.\n:return: The same collection ordered in ascending order.\n\nTime Complexity: O(n log n)\nSpace Complexity: O(n)\n\nExamples:\n>>> merge_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> merge_sort([])\n[]\n>>> merge_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_recursive::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_recursive",
+        "kind": "function",
+        "distance": 0.845801830291748,
+        "snippet": "def bubble_sort_recursive(collection: list[Any]) -> list[Any]:\n    \"\"\"It is similar iterative bubble sort but recursive.\n\n    :param collection: mutable ordered sequence of elements\n    :return: the same list in ascending order\n\n    Examples:\n    >>> bubble_sort_recursive([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_recursive([])\n    []\n    >>> bubble_sort_recursive([-2, -45, -5])\n    "
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_heap_sort_2e040db62c",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_heap_sort_2e040db62c",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on [0, 5, 3, 2, 2] | assert [2, 2, 3, 5, 0] == [0, 2, 2, 3, 5] | E         At index 0 diff: 2 != 0 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_heap_sort_2e040db62c_rag.py::test_heap_sort - A...",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 57.14,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_heap_sort_2e040db62c_RAG_a1.py",
+    "context_chunks": [
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 0.10100634396076202,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 0.4506267011165619,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 0.47115862369537354,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::docstring",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "docstring",
+        "distance": 0.5431228876113892,
+        "snippet": "bubble_sort_iterative: Pure implementation of bubble sort algorithm in Python\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> bubble_sort_iterative([0, 5, 2, 3, 2])\n[0, 2, 2, 3, 5]\n>>> bubble_sort_iterative([])\n[]\n>>> bubble_sort_iterative([-2, -45, -5])\n[-45, -5, -2]\n>>> bubble_so"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "function",
+        "distance": 0.5490617752075195,
+        "snippet": "def bubble_sort_iterative(collection: list[Any]) -> list[Any]:\n    \"\"\"Pure implementation of bubble sort algorithm in Python\n\n    :param collection: some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return: the same collection ordered in ascending order\n\n    Examples:\n    >>> bubble_sort_iterative([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_iterative("
+      },
+      {
+        "id": "shell_sort.py::shell_sort::docstring",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "docstring",
+        "distance": 0.6133667230606079,
+        "snippet": "shell_sort: Pure implementation of shell sort algorithm in Python\n:param collection:  Some mutable ordered collection with heterogeneous\ncomparable items inside\n:return:  the same collection ordered by ascending\n\n>>> shell_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> shell_sort([])\n[]\n>>> shell_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.6336599588394165,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_Comparable.__lt___7c47b8341e",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_Comparable'; pytest: ERROR test_codekong_semantic_Comparable.__lt___7c47b8341e_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 57.32,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_Comparable.__lt___7c47b8341e_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 1.3634114265441895,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heapify::function",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "function",
+        "distance": 1.395697832107544,
+        "snippet": "def heapify(unsorted: list[int], index: int, heap_size: int) -> None:\n    \"\"\"\n    :param unsorted: unsorted list containing integers numbers\n    :param index: index\n    :param heap_size: size of the heap\n    :return: None\n    >>> unsorted = [1, 4, 3, 5, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n    [4, 5, 3, 1, 2]\n    >>> heapify(unsorted, 0, len(unsorted))\n    >>> unsorted\n "
+      },
+      {
+        "id": "shell_sort.py::shell_sort::docstring",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "docstring",
+        "distance": 1.4093648195266724,
+        "snippet": "shell_sort: Pure implementation of shell sort algorithm in Python\n:param collection:  Some mutable ordered collection with heterogeneous\ncomparable items inside\n:return:  the same collection ordered by ascending\n\n>>> shell_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> shell_sort([])\n[]\n>>> shell_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "heap_sort.py::heapify::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heapify",
+        "kind": "docstring",
+        "distance": 1.435657262802124,
+        "snippet": "heapify: :param unsorted: unsorted list containing integers numbers\n:param index: index\n:param heap_size: size of the heap\n:return: None\n>>> unsorted = [1, 4, 3, 5, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[4, 5, 3, 1, 2]\n>>> heapify(unsorted, 0, len(unsorted))\n>>> unsorted\n[5, 4, 3, 1, 2]"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_recursive::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_recursive",
+        "kind": "function",
+        "distance": 1.436403512954712,
+        "snippet": "def bubble_sort_recursive(collection: list[Any]) -> list[Any]:\n    \"\"\"It is similar iterative bubble sort but recursive.\n\n    :param collection: mutable ordered sequence of elements\n    :return: the same list in ascending order\n\n    Examples:\n    >>> bubble_sort_recursive([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_recursive([])\n    []\n    >>> bubble_sort_recursive([-2, -45, -5])\n    "
+      },
+      {
+        "id": "gnome_sort.py::gnome_sort::docstring",
+        "file": "gnome_sort.py",
+        "qualname": "gnome_sort",
+        "kind": "docstring",
+        "distance": 1.4515687227249146,
+        "snippet": "gnome_sort: Pure implementation of the gnome sort algorithm in Python\n\nTake some mutable ordered collection with heterogeneous comparable items inside as\narguments, return the same collection ordered by ascending.\n\nExamples:\n>>> gnome_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> gnome_sort([])\n[]\n\n>>> gnome_sort([-2, -5, -45])\n[-45, -5, -2]\n\n>>> \"\".join(gnome_sort(list(set(\"Gnomes are stupid!\"))))\n'"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 1.4549229145050049,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_insertion_sort_5acbd41981",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "KILLED",
+    "attempts": 1,
+    "retry_used": false,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_insertion_sort_5acbd41981",
+        "stage": "mutant",
+        "status": "PASS",
+        "reason": "Test passes on original and fails on mutant: mutant KILLED.",
+        "failing_assertion": "Failing assertion(s): AssertionError: Failed on negative integers | assert [-2, -5, -45] == [-45, -5, -2] | E         At index 0 diff: -2 != -45 | Use -v to get more diff; pytest: FAILED test_codekong_semantic_insertion_sort_5acbd41981_rag.py::test_insertion_sort",
+        "original_run_passed": true,
+        "mutant_run_failed": true,
+        "attempt": 1
+      }
+    ],
+    "wall_seconds": 37.79,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_insertion_sort_5acbd41981_RAG_a1.py",
+    "context_chunks": [
+      {
+        "id": "insertion_sort.py::insertion_sort::docstring",
+        "file": "insertion_sort.py",
+        "qualname": "insertion_sort",
+        "kind": "docstring",
+        "distance": 0.2837653160095215,
+        "snippet": "insertion_sort: A pure Python implementation of the insertion sort algorithm\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered by ascending\n\nExamples:\n>>> insertion_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> insertion_sort([]) == sorted([])\nTrue\n>>> insertion_sort([-2, -5, -45]) == sorted([-2, -5, -45])\nTrue\n>>> inser"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.6386675238609314,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "shell_sort.py::shell_sort::function",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "function",
+        "distance": 0.6483347415924072,
+        "snippet": "def shell_sort(collection: list[int]) -> list[int]:\n    \"\"\"Pure implementation of shell sort algorithm in Python\n    :param collection:  Some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return:  the same collection ordered by ascending\n\n    >>> shell_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> shell_sort([])\n    []\n    >>> shell_sort([-2, -5, -45])\n    [-45"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.6747101545333862,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "heap_sort.py::heap_sort::docstring",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "docstring",
+        "distance": 0.6841296553611755,
+        "snippet": "heap_sort: A pure Python implementation of the heap sort algorithm\n\n:param collection: a mutable ordered collection of heterogeneous comparable items\n:return: the same collection ordered by ascending\n\nExamples:\n>>> heap_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> heap_sort([])\n[]\n>>> heap_sort([-2, -5, -45])\n[-45, -5, -2]\n>>> heap_sort([3, 7, 9, 28, 123, -5, 8, -30, -200, 0, 4])\n[-200, -30, -5, 0, 3"
+      },
+      {
+        "id": "heap_sort.py::heap_sort::function",
+        "file": "heap_sort.py",
+        "qualname": "heap_sort",
+        "kind": "function",
+        "distance": 0.7152950167655945,
+        "snippet": "def heap_sort(unsorted: list[int]) -> list[int]:\n    \"\"\"\n    A pure Python implementation of the heap sort algorithm\n\n    :param collection: a mutable ordered collection of heterogeneous comparable items\n    :return: the same collection ordered by ascending\n\n    Examples:\n    >>> heap_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> heap_sort([])\n    []\n    >>> heap_sort([-2, -5, -45])\n    [-45, "
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "function",
+        "distance": 0.7246147990226746,
+        "snippet": "def bubble_sort_iterative(collection: list[Any]) -> list[Any]:\n    \"\"\"Pure implementation of bubble sort algorithm in Python\n\n    :param collection: some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return: the same collection ordered in ascending order\n\n    Examples:\n    >>> bubble_sort_iterative([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_iterative("
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "INVALID_TEST",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": false,
+    "validation": [
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_merge_sort.merge_efcd3e7311",
+        "stage": "original",
+        "status": "FAIL",
+        "reason": "Test FAILS against the original, correct code, so it is invalid. It must pass on the original implementation. Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "failing_assertion": "Failing assertion(s): ModuleNotFoundError: No module named 'test_codekong_semantic_merge_sort'; pytest: ERROR test_codekong_semantic_merge_sort.merge_efcd3e7311_rag.py",
+        "original_run_passed": false,
+        "mutant_run_failed": null,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 60.5,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_merge_sort.merge_efcd3e7311_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "merge_sort.py::merge_sort::function",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "function",
+        "distance": 0.2156042605638504,
+        "snippet": "def merge_sort(collection: list) -> list:\n    \"\"\"\n    Sorts a list using the merge sort algorithm.\n\n    :param collection: A mutable ordered collection with comparable items.\n    :return: The same collection ordered in ascending order.\n\n    Time Complexity: O(n log n)\n    Space Complexity: O(n)\n\n    Examples:\n    >>> merge_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> merge_sort([])\n    []\n   "
+      },
+      {
+        "id": "merge_sort.py::merge_sort.merge::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort.merge",
+        "kind": "docstring",
+        "distance": 0.31592315435409546,
+        "snippet": "merge_sort.merge: Merge two sorted lists into a single sorted list.\n\n:param left: Left collection\n:param right: Right collection\n:return: Merged result"
+      },
+      {
+        "id": "merge_sort.py::merge_sort::docstring",
+        "file": "merge_sort.py",
+        "qualname": "merge_sort",
+        "kind": "docstring",
+        "distance": 0.694145917892456,
+        "snippet": "merge_sort: Sorts a list using the merge sort algorithm.\n\n:param collection: A mutable ordered collection with comparable items.\n:return: The same collection ordered in ascending order.\n\nTime Complexity: O(n log n)\nSpace Complexity: O(n)\n\nExamples:\n>>> merge_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> merge_sort([])\n[]\n>>> merge_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 1.0998046398162842,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 1.108270525932312,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::function",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "function",
+        "distance": 1.1119873523712158,
+        "snippet": "def quick_sort(collection: list) -> list:\n    \"\"\"A pure Python implementation of quicksort algorithm.\n\n    :param collection: a mutable collection of comparable items\n    :return: the same collection ordered in ascending order\n\n    Examples:\n    >>> quick_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> quick_sort([])\n    []\n    >>> quick_sort([-2, 5, 0, -45])\n    [-45, -2, 0, 5]\n    \"\"\"\n    # Ba"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::function",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "function",
+        "distance": 1.140731692314148,
+        "snippet": "def comb_sort(data: list) -> list:\n    \"\"\"Pure implementation of comb sort algorithm in Python\n    :param data: mutable collection with comparable items\n    :return: the same collection in ascending order\n    Examples:\n    >>> comb_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> comb_sort([])\n    []\n    >>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n    [-15, -7, 0, 2, 3, 8, 45, 99]\n    \"\"\"\n    sh"
+      }
+    ]
+  },
+  {
+    "mutant_id": "semantic_selection_sort_8c56e12767",
+    "mutation_class": "semantic",
+    "condition": "RAG",
+    "k": 8,
+    "subject": "sorts_focused",
+    "status": "SURVIVED",
+    "attempts": 2,
+    "retry_used": true,
+    "valid_test_produced": true,
+    "validation": [
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 1
+      },
+      {
+        "mutant_id": "semantic_selection_sort_8c56e12767",
+        "stage": "mutant",
+        "status": "FAIL",
+        "reason": "Test passes on BOTH original and mutant \u2014 it does not exercise the mutated behavior. Target inputs where the diff changes the output.",
+        "failing_assertion": null,
+        "original_run_passed": true,
+        "mutant_run_failed": false,
+        "attempt": 2
+      }
+    ],
+    "wall_seconds": 62.65,
+    "test_file": "/home/adarsh_rajesh/codekong/module3_llm/generated_tests/semantic_selection_sort_8c56e12767_RAG_a2.py",
+    "context_chunks": [
+      {
+        "id": "selection_sort.py::selection_sort::docstring",
+        "file": "selection_sort.py",
+        "qualname": "selection_sort",
+        "kind": "docstring",
+        "distance": 0.5876479148864746,
+        "snippet": "selection_sort: Sorts a list in ascending order using the selection sort algorithm.\n\n:param collection: A list of integers to be sorted.\n:return: The sorted list.\n\nExamples:\n>>> selection_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n\n>>> selection_sort([])\n[]\n\n>>> selection_sort([-2, -5, -45])\n[-45, -5, -2]"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::docstring",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "docstring",
+        "distance": 0.6371151804924011,
+        "snippet": "quick_sort: A pure Python implementation of quicksort algorithm.\n\n:param collection: a mutable collection of comparable items\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> quick_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> quick_sort([])\n[]\n>>> quick_sort([-2, 5, 0, -45])\n[-45, -2, 0, 5]"
+      },
+      {
+        "id": "comb_sort.py::comb_sort::docstring",
+        "file": "comb_sort.py",
+        "qualname": "comb_sort",
+        "kind": "docstring",
+        "distance": 0.6505362391471863,
+        "snippet": "comb_sort: Pure implementation of comb sort algorithm in Python\n:param data: mutable collection with comparable items\n:return: the same collection in ascending order\nExamples:\n>>> comb_sort([0, 5, 3, 2, 2])\n[0, 2, 2, 3, 5]\n>>> comb_sort([])\n[]\n>>> comb_sort([99, 45, -7, 8, 2, 0, -15, 3])\n[-15, -7, 0, 2, 3, 8, 45, 99]"
+      },
+      {
+        "id": "shell_sort.py::shell_sort::function",
+        "file": "shell_sort.py",
+        "qualname": "shell_sort",
+        "kind": "function",
+        "distance": 0.7358401417732239,
+        "snippet": "def shell_sort(collection: list[int]) -> list[int]:\n    \"\"\"Pure implementation of shell sort algorithm in Python\n    :param collection:  Some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return:  the same collection ordered by ascending\n\n    >>> shell_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> shell_sort([])\n    []\n    >>> shell_sort([-2, -5, -45])\n    [-45"
+      },
+      {
+        "id": "quick_sort.py::quick_sort::function",
+        "file": "quick_sort.py",
+        "qualname": "quick_sort",
+        "kind": "function",
+        "distance": 0.7373735904693604,
+        "snippet": "def quick_sort(collection: list) -> list:\n    \"\"\"A pure Python implementation of quicksort algorithm.\n\n    :param collection: a mutable collection of comparable items\n    :return: the same collection ordered in ascending order\n\n    Examples:\n    >>> quick_sort([0, 5, 3, 2, 2])\n    [0, 2, 2, 3, 5]\n    >>> quick_sort([])\n    []\n    >>> quick_sort([-2, 5, 0, -45])\n    [-45, -2, 0, 5]\n    \"\"\"\n    # Ba"
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::function",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "function",
+        "distance": 0.7565740942955017,
+        "snippet": "def bubble_sort_iterative(collection: list[Any]) -> list[Any]:\n    \"\"\"Pure implementation of bubble sort algorithm in Python\n\n    :param collection: some mutable ordered collection with heterogeneous\n    comparable items inside\n    :return: the same collection ordered in ascending order\n\n    Examples:\n    >>> bubble_sort_iterative([0, 5, 2, 3, 2])\n    [0, 2, 2, 3, 5]\n    >>> bubble_sort_iterative("
+      },
+      {
+        "id": "bubble_sort.py::bubble_sort_iterative::docstring",
+        "file": "bubble_sort.py",
+        "qualname": "bubble_sort_iterative",
+        "kind": "docstring",
+        "distance": 0.7714625000953674,
+        "snippet": "bubble_sort_iterative: Pure implementation of bubble sort algorithm in Python\n\n:param collection: some mutable ordered collection with heterogeneous\ncomparable items inside\n:return: the same collection ordered in ascending order\n\nExamples:\n>>> bubble_sort_iterative([0, 5, 2, 3, 2])\n[0, 2, 2, 3, 5]\n>>> bubble_sort_iterative([])\n[]\n>>> bubble_sort_iterative([-2, -45, -5])\n[-45, -5, -2]\n>>> bubble_so"
+      }
+    ]
+  }
+]

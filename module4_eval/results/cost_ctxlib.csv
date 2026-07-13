@@ -1,0 +1,7 @@
+condition,mutation_class,calls,total_wall_seconds,total_eval_tokens,total_prompt_tokens
+NO_RAG,higher_order,8,101.93,780,7811
+NO_RAG,sdl,25,205.28,1474,21234
+NO_RAG,semantic,14,376.73,2913,13364
+RAG,higher_order,13,294.15,1361,15661
+RAG,sdl,47,461.81,2700,56296
+RAG,semantic,32,1076.8,6931,42809

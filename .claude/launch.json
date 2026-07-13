@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "codekong-ui",
+      "runtimeExecutable": "C:\\Users\\Adarsh Rajesh\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe",
+      "runtimeArgs": ["-m", "frontend.app"],
+      "port": 5001
+    }
+  ]
+}
