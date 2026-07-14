@@ -1,0 +1,19 @@
+# Keep the image small and the build clean.
+.git
+.gitignore
+venv/
+**/__pycache__/
+*.pyc
+*.pyo
+module2_rag/chroma_db/
+module3_llm/llm_calls.jsonl
+node_modules/
+frontend/uploads/
+subjects/user_*/
+generated_test_suites/
+module1_mutation/_scratch/
+.claude/settings.local.json
+*.log
+*.zip
+*.tar
+*.tar.gz

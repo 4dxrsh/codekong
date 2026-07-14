@@ -1,0 +1,11 @@
+# Minimal dependencies for the CodeKong demo container:
+#   - serves the web UI (real committed results, walkthrough, caught bugs)
+#   - runs the offline smoke suite (tests/smoke_all.py -> 9/9)
+# LIVE test generation additionally needs the full requirements.txt
+# (torch, chromadb, sentence-transformers) plus a running Ollama server.
+flask>=3.0,<4
+pandas>=2.2,<3
+matplotlib>=3.8,<4
+pyyaml>=6.0,<7
+python-dotenv>=1.0,<2
+requests>=2.31,<3

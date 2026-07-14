@@ -8,6 +8,7 @@ Then open http://localhost:5001
 """
 from __future__ import annotations
 
+import os
 import sys
 import threading
 import time
@@ -1149,4 +1150,8 @@ def job_download(job_id):
 
 if __name__ == "__main__":
     # Local, single-user research UI. 5001 avoids clashing with common 5000 users.
-    app.run(host="127.0.0.1", port=5001, debug=False)
+    # Bind 127.0.0.1 for local single-user dev; the Docker image sets
+    # HOST=0.0.0.0 so the UI is reachable from the host via published port.
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", "5001"))
+    app.run(host=host, port=port, debug=False)
