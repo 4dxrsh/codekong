@@ -1,0 +1,73 @@
+# CodeKong — FULL self-contained container for review submission.
+#
+# Unlike the lightweight demo image (Dockerfile), this bundles EVERYTHING
+# needed to run the live pipeline with no internet, no GPU, and no API key:
+#   - CPU-only PyTorch + the ML stack (chromadb/sentence-transformers)
+#   - a local Ollama server + the qwen2.5-coder:7b model baked into the image
+#   - the sentence-transformers embedding model cached in the image
+#   - the CodeKong app + real committed results
+#
+# The reviewer runs two commands and opens a browser:
+#   docker load -i codekong-full.tar
+#   docker run --rm -p 5001:5001 codekong-full     # open http://localhost:5001
+#
+# Ollama runs CPU-only inside Docker, so LIVE generation is slow
+# (~10-60s/generation). The pre-computed results are always shown in the UI.
+#
+# Layer order is chosen so the expensive 4.7GB model-pull layer stays cached
+# even when the Python/app layers change.
+FROM python:3.12-slim
+
+# System deps: curl for the Ollama installer + readiness checks; zstd is
+# required by the Ollama installer to extract its release archive.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl ca-certificates zstd \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install the Ollama server, then delete the GPU runtime libraries in the SAME
+# layer — this container runs CPU-only inside Docker, so the CUDA/ROCm/Vulkan
+# libs (~2GB) are pure dead weight. (Deleting them in a later layer would not
+# shrink the image, since layers are additive.)
+RUN curl -fsSL https://ollama.com/install.sh | sh \
+ && rm -rf /usr/local/lib/ollama/cuda_v12 \
+           /usr/local/lib/ollama/cuda_v13 \
+           /usr/local/lib/ollama/rocm \
+           /usr/local/lib/ollama/vulkan
+
+# Bake the LLM into the image early (before the Python layers) so this large,
+# slow layer stays cached across app/dependency changes. Start the server,
+# pull the model, stop it; the blobs are committed into this layer.
+RUN ollama serve & \
+    for i in $(seq 1 60); do curl -sf http://localhost:11434/api/tags >/dev/null 2>&1 && break; sleep 1; done; \
+    ollama pull qwen2.5-coder:7b && \
+    (pkill -f "ollama serve" || true)
+
+WORKDIR /app
+
+# CPU-only PyTorch first (the default wheel bundles ~4GB of CUDA libraries that
+# are useless in this CPU container). sentence-transformers then reuses it
+# instead of pulling the CUDA build.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# The rest of the full Python dependencies.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Cache the sentence-transformers embedding model into the image so RAG works
+# offline (no HuggingFace download at runtime).
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+
+# App code + committed results, benchmark, and generated tests.
+COPY . .
+
+ENV HOST=0.0.0.0 \
+    PORT=5001 \
+    PYTHONUNBUFFERED=1
+
+EXPOSE 5001
+
+# Entrypoint starts Ollama, waits for it, then serves the web app.
+# Strip any CRLF (the file may be authored on Windows) so bash can run it.
+COPY docker/start.sh /start.sh
+RUN sed -i 's/\r$//' /start.sh && chmod +x /start.sh
+CMD ["/start.sh"]
