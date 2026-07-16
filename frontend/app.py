@@ -23,7 +23,13 @@ from flask import (Flask, abort, redirect, render_template_string,
 
 from frontend import data as D
 
+from core.input_security import (safe_filename, validate_source,
+                                 clean_description, InputRejected)
+
 app = Flask(__name__)
+# Defence in depth: reject oversized request bodies at the WSGI layer before
+# they are ever buffered (a single .py upload + form fields is tiny).
+app.config["MAX_CONTENT_LENGTH"] = 2_000_000
 UPLOADS = PROJECT_ROOT / "frontend" / "uploads"
 JOBS: dict[str, dict] = {}
 _JOBS_LOCK = threading.Lock()
@@ -335,11 +341,12 @@ def home():
 
 # ------------------------------------------------ Transparent Pipeline (demo)
 # A fixed, backend-free walk-through of the whole pipeline for a non-technical
-# audience: one tiny function (clamp) followed through every stage with
-# animations and plain-language copy. Uses canned data on purpose — it explains
-# the PROCESS and never claims to be live results (honesty badge + labelled
-# scoreboard). Injected raw into BASE, so its CSS/JS braces are never parsed as
-# Jinja.
+# audience: the REAL bulk_discount function from the ctxlib benchmark (the same
+# example as the deck/paper) followed through every stage with animations and
+# plain-language copy. The numbers (0.04, the retrieval distances, 78%/12%) are
+# real run values, retold step by step — it explains the PROCESS and does not
+# run the live model (honesty badge). Injected raw into BASE, so its CSS/JS
+# braces are never parsed as Jinja.
 PIPELINE = r"""<style>
 .wk{--sig:var(--lav);--sig2:var(--matcha);--warn:var(--amber);--good:var(--matcha);--bad:var(--rose);--card:#161320;--card2:#1c1829}
 .wk .top{text-align:center;margin-bottom:26px}
@@ -494,14 +501,82 @@ PIPELINE = r"""<style>
 .wk .b.pri{background:linear-gradient(135deg,var(--sig),var(--sig2));color:#1a1424;border-color:transparent}
 .wk .count{margin-left:auto;font-family:"Times New Roman",Times,Georgia,serif;font-weight:500;font-size:15px;color:var(--muted)}
 .wk .foot{margin-top:18px;font-size:13px;color:var(--faint);text-align:center}
-@media(prefers-reduced-motion:reduce){.wk .cur{display:none}}
+@media(prefers-reduced-motion:reduce){.wk .cur{display:none}
+  /* content that is normally revealed by animation must stay visible when
+     motion is off, or reduced-motion users see blank panels. */
+  .wk .ri,.wk .verd,.wk .lka,.wk .stamp{opacity:1!important;transform:none!important}
+  .wk .lkr.hitrow{opacity:1!important}}
+
+/* value-lookup table (scene 2) — a token finds 10 -> 0.04 */
+.wk .lookup{background:#120f1b;border:1px solid var(--line);border-radius:16px;padding:26px 24px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.wk .lkq{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;color:#e6e2f2;margin-bottom:15px}
+.wk .lkq b{color:var(--matcha)}
+.wk .lkt{display:flex;flex-direction:column;gap:8px;max-width:260px;margin:0 auto;width:100%}
+.wk .lkr{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;color:var(--muted);background:#1a1526;border:1px solid var(--line);border-radius:10px;padding:9px 14px}
+.wk .lkr.hitrow{opacity:.5}
+.wk .scene.active .lkr.hitrow{animation:wkhit .9s ease 1.1s forwards}
+@keyframes wkhit{to{opacity:1;color:var(--matcha);border-color:var(--matcha);background:var(--matcha-soft);transform:scale(1.07);font-weight:700}}
+.wk .lka{margin-top:17px;font-family:"Times New Roman",Times,Georgia,serif;font-size:19px;color:#e6e2f2;opacity:0}
+.wk .scene.active .lka{animation:wkrise .6s ease 1.95s both}
+.wk .lka b{color:var(--matcha);font-weight:600}
+
+/* ============ continuous / fluid motion ============ */
+/* an always-moving conveyor that shows the whole flow at a glance */
+.wk .flowbar{position:relative;max-width:840px;margin:0 auto 26px;padding:15px 22px;background:#161320;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.wk .flowtrack{position:relative;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.wk .fstage{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--muted);white-space:nowrap;z-index:1;transition:color .3s}
+.wk .fstage.good{color:var(--matcha)}
+.wk .farrow{color:var(--faint);z-index:1;font-size:12px}
+.wk .ftoken{position:absolute;top:50%;left:7%;width:11px;height:11px;border-radius:50%;background:var(--matcha);
+  box-shadow:0 0 16px 5px rgba(166,211,172,.65);transform:translate(-50%,-50%);animation:wkconvey 7s cubic-bezier(.55,0,.45,1) infinite}
+@keyframes wkconvey{0%,6%{left:7%}22%,30%{left:30%}46%,54%{left:52%}70%,78%{left:73%}94%,100%{left:93%}}
+/* soft moving glow across the conveyor */
+.wk .flowbar::after{content:"";position:absolute;inset:0;background:radial-gradient(120px 60px at 0% 50%,rgba(166,211,172,.14),transparent 70%);
+  animation:wksheen 7s cubic-bezier(.55,0,.45,1) infinite;pointer-events:none}
+@keyframes wksheen{0%{transform:translateX(0)}100%{transform:translateX(760px)}}
+
+/* floating memory nodes — gentle, endless drift */
+.wk .space .pt{animation:wkfloat 6.5s ease-in-out infinite}
+.wk .space .pt.p2{animation-delay:-1.6s}.wk .space .pt.p3{animation-delay:-3.2s}
+.wk .space .pt.p4{animation-delay:-4.8s}.wk .space .pt.p5{animation-delay:-2.4s}
+.wk .space .pt.hit{animation:wkfloat 6.5s ease-in-out infinite,wkpulse 1.9s ease-in-out infinite}
+@keyframes wkfloat{0%,100%{transform:translate(-50%,-50%)}33%{transform:translate(-53%,-64%)}66%{transform:translate(-47%,-40%)}}
+
+/* the top retrieval hit keeps a soft moving shimmer */
+.wk .ri.key{background:linear-gradient(100deg,var(--lav-soft) 0%,rgba(183,166,234,.03) 50%,var(--lav-soft) 100%);
+  background-size:220% 100%;animation:wkshimmer 3.4s linear infinite}
+@keyframes wkshimmer{to{background-position:-220% 0}}
+
+/* the found answer keeps breathing so the eye stays on it */
+.wk .scene.active .lka b{animation:wkbreathe 2.4s ease-in-out 2.6s infinite}
+@keyframes wkbreathe{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* glossary cards */
+.wk .gloss{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:760px){.wk .gloss{grid-template-columns:1fr}}
+.wk .gt{background:#120f1b;border:1px solid var(--line);border-radius:13px;padding:13px 16px}
+.wk .gt b{font-family:"Times New Roman",Times,Georgia,serif;font-weight:600;font-size:15.5px;color:var(--sig2);display:block;margin-bottom:3px}
+.wk .gt span{font-size:13px;color:var(--muted);line-height:1.5}
+/* keep decorative motion sane when the viewer asked for less */
+@media(prefers-reduced-motion:reduce){.wk .ftoken,.wk .flowbar::after{animation:none;left:93%}}
 </style>
 
 <div class="wk">
   <div class="top">
     <h1>How <span class="grad">CodeKong</span> works</h1>
-    <p class="subtitle">Follow one small piece of code all the way through — from a planted bug to the test that catches it. Move with <b>Next</b>, or press <b>Play</b>.</p>
-    <span class="badge">A guided walk-through · illustrative, not live data</span>
+    <p class="subtitle">Follow one small piece of code all the way through — from a planted bug to the test that catches it. Move with <b>Next</b>, or press <b>Play</b>. Every technical term is explained in the final step.</p>
+    <span class="badge">A guided walk-through · a real example from the run, retold step by step</span>
+  </div>
+
+  <div class="flowbar" aria-hidden="true">
+    <div class="flowtrack">
+      <span class="fstage">Working code</span><span class="farrow">→</span>
+      <span class="fstage">Plant a bug</span><span class="farrow">→</span>
+      <span class="fstage">Build the memory</span><span class="farrow">→</span>
+      <span class="fstage">AI writes a test</span><span class="farrow">→</span>
+      <span class="fstage good">Bug caught</span>
+      <span class="ftoken"></span>
+    </div>
   </div>
 
   <div class="track" id="wkTrack"></div>
@@ -520,73 +595,78 @@ PIPELINE = r"""<style>
 
     <!-- 2 -->
     <section class="scene" data-label="The code">
-      <p class="narr rise">Meet our example — a small function called <b>clamp</b>.</p>
-      <h2 class="rise d1">Keep a number in range</h2>
+      <p class="narr rise">Meet our example — a real function from the benchmark, <b>bulk_discount</b>.</p>
+      <h2 class="rise d1">What discount does an order earn?</h2>
       <div class="g2">
-        <pre class="c rise d2"><span class="kw">def</span> <span class="fn">clamp</span>(x, low, high):
-    <span class="cm"># keep x between low and high</span>
-    <span class="kw">if</span> x &lt; low:  <span class="kw">return</span> low
-    <span class="kw">if</span> x &gt; high: <span class="kw">return</span> high
-    <span class="kw">return</span> x</pre>
-        <div class="slider rise d3">
-          <div class="callout">You ask for <b>15</b>…</div>
-          <div class="bar-line"><span class="zone"></span><span class="knob go"></span></div>
-          <div class="ticks"><span>low = 0</span><span>high = 10</span></div>
-          <div class="callout" style="margin-top:16px">…and clamp gives you <b>10</b>.</div>
+        <pre class="c rise d2"><span class="kw">def</span> <span class="fn">bulk_discount</span>(quantity):
+    <span class="cm"># bigger orders earn a bigger discount</span>
+    <span class="kw">for</span> min_qty, frac <span class="kw">in</span> BULK_BREAKS:
+        <span class="kw">if</span> quantity &gt;= min_qty:
+            <span class="kw">return</span> frac
+    <span class="kw">return</span> 0.0</pre>
+        <div class="lookup rise d3">
+          <div class="lkq">an order of <b>10</b> units…</div>
+          <div class="lkt">
+            <div class="lkr">100 or more&nbsp;&nbsp;→&nbsp;&nbsp;18%</div>
+            <div class="lkr">50 or more&nbsp;&nbsp;→&nbsp;&nbsp;11%</div>
+            <div class="lkr hitrow">10 or more&nbsp;&nbsp;→&nbsp;&nbsp;4%</div>
+            <div class="lkr">fewer&nbsp;&nbsp;→&nbsp;&nbsp;0%</div>
+          </div>
+          <div class="lka">…so the answer is <b>0.04</b></div>
         </div>
       </div>
-      <div class="note rise d4"><span class="m"></span><p>Watch the line <b>“if x &gt; high: return high”</b> — the rule that caps large numbers. It's about to be sabotaged.</p></div>
+      <div class="note rise d4"><span class="m"></span><p>The catch: those percentages live in a <b style="color:var(--lav)">different file</b> (rates.py). To test <b>bulk_discount(10)</b> you must know it returns <b style="color:var(--matcha)">0.04</b> — a number you cannot guess.</p></div>
     </section>
 
     <!-- 3 -->
     <section class="scene" data-label="Plant a bug">
-      <p class="narr rise">Now we sneak in a bug — by quietly deleting the "cap" rule.</p>
+      <p class="narr rise">Now we sneak in a bug — by quietly deleting one line.</p>
       <h2 class="rise d1">Break it on purpose</h2>
       <div class="g2">
         <div class="rise d2"><p class="label g">Before — works correctly</p>
-        <pre class="c"><span class="kw">if</span> x &lt; low:  <span class="kw">return</span> low
-    <span class="del">if x &gt; high: return high</span>
-    <span class="kw">return</span> x</pre></div>
-        <div class="rise d3"><p class="label b">After — the cap is gone</p>
-        <pre class="c"><span class="kw">if</span> x &lt; low:  <span class="kw">return</span> low
-
-    <span class="kw">return</span> x
-<span class="cm"># clamp(15) now returns 15, not 10</span></pre></div>
+        <pre class="c">    <span class="kw">if</span> quantity &gt;= min_qty:
+        <span class="add">return frac</span>
+    <span class="kw">return</span> 0.0</pre></div>
+        <div class="rise d3"><p class="label b">After — one line deleted</p>
+        <pre class="c">    <span class="kw">if</span> quantity &gt;= min_qty:
+        <span class="del">·········</span>
+    <span class="kw">return</span> 0.0
+<span class="cm"># bulk_discount(10) now returns 0.0, not 0.04</span></pre></div>
       </div>
-      <div class="note bad rise d4"><span class="m"></span><p>It looks almost identical — but large numbers are no longer capped. <b style="color:var(--rose)">A good test should notice. Let's find out if it does.</b></p></div>
+      <div class="note bad rise d4"><span class="m"></span><p>It looks almost identical — but now <b style="color:var(--rose)">every order gets no discount</b>. A good test should notice. Let's find out if it does.</p></div>
     </section>
 
     <!-- 4 -->
     <section class="scene" data-label="Tests miss it">
-      <p class="narr rise">The existing test only checks a middle value — so it passes on the broken code too.</p>
+      <p class="narr rise">The existing test only checks a tiny order — so it passes on the broken code too.</p>
       <h2 class="rise d1">The test looks the other way</h2>
-      <pre class="c rise d2" style="margin-bottom:16px"><span class="kw">def</span> <span class="fn">test_clamp</span>():
-    <span class="kw">assert</span> clamp(5) == 5   <span class="cm"># only ever checks the easy middle</span></pre>
+      <pre class="c rise d2" style="margin-bottom:16px"><span class="kw">def</span> <span class="fn">test_discount</span>():
+    <span class="kw">assert</span> bulk_discount(3) == 0.0   <span class="cm"># a tiny order earns nothing anyway</span></pre>
       <div class="judge">
-        <div class="jb rise d3"><div class="r">on the correct code</div><div class="o">clamp(5) → 5</div><span class="vb p">passes</span></div>
-        <div class="jb rise d4"><div class="r">on the broken code</div><div class="o">clamp(5) → 5</div><span class="vb p">passes</span></div>
+        <div class="jb rise d3"><div class="r">on the correct code</div><div class="o">bulk_discount(3) → 0.0</div><span class="vb p">passes</span></div>
+        <div class="jb rise d4"><div class="r">on the broken code</div><div class="o">bulk_discount(3) → 0.0</div><span class="vb p">passes</span></div>
       </div>
       <div class="note bad rise d4"><span class="m"></span><p>Same answer both times, so the bug slips through undetected. <b style="color:var(--rose)">This blind spot is exactly what CodeKong hunts down.</b></p></div>
     </section>
 
     <!-- 5 -->
     <section class="scene" data-label="Build a memory">
-      <p class="narr rise">Here's the key idea — we file the whole codebase into a searchable memory.</p>
+      <p class="narr rise">Here's the key idea — we file the <b>whole codebase</b> into a searchable memory.</p>
       <h2 class="rise d1">Give the AI a memory</h2>
       <div class="maprow">
         <div class="cards">
-          <div class="cc rise d1"><b>clamp</b> — caps a number</div>
-          <div class="cc rise d1"><b>in_range</b> — is x inside [low, high]?</div>
-          <div class="cc rise d2"><b>limits</b> — low = 0, high = 10</div>
-          <div class="cc rise d2"><b>grade</b> — uses clamp on scores</div>
-          <div class="cc rise d3"><b>notes</b> — “keep numbers in range”</div>
+          <div class="cc rise d1"><b>bulk_discount</b> — the function itself</div>
+          <div class="cc rise d1"><b>BULK_BREAKS</b> — the discount table (10 → 0.04)</div>
+          <div class="cc rise d2"><b>DISCOUNTS</b> — loyalty-tier table</div>
+          <div class="cc rise d2"><b>“returns the bulk discount…”</b> — its docstring</div>
+          <div class="cc rise d3"><b>test_bulk_discount</b> — an existing test</div>
         </div>
-        <div class="space rise d2"><span class="cap">the memory</span>
+        <div class="space rise d2"><span class="cap">the memory · 49 pieces of the codebase</span>
           <span class="pt p1" style="left:30%;top:40%"></span><span class="pt p2" style="left:46%;top:56%"></span>
           <span class="pt p3" style="left:70%;top:30%"></span><span class="pt p4" style="left:62%;top:72%"></span>
           <span class="pt p5" style="left:24%;top:72%"></span></div>
       </div>
-      <div class="note rise d4"><span class="m"></span><p>Each dot is a piece of the codebase, arranged by <b style="color:var(--lav)">meaning</b> — so later we can ask, “what relates to this bug?” and get useful answers.</p></div>
+      <div class="note rise d4"><span class="m"></span><p>Functions, docstrings, tests — and crucially the <b style="color:var(--lav)">constant tables</b>. Each piece is placed <b>by meaning</b> (an “embedding”), so we can later ask “what relates to this bug?” Researchers call this searchable memory <b style="color:var(--lav)">RAG</b> — every term is defined in the last step.</p></div>
     </section>
 
     <!-- 6 -->
@@ -599,12 +679,12 @@ PIPELINE = r"""<style>
           <span class="pt p1 hit" style="left:30%;top:40%"></span><span class="pt p2 hit" style="left:46%;top:56%"></span>
           <span class="pt p3 hit" style="left:24%;top:60%"></span><span class="pt p4" style="left:72%;top:30%"></span><span class="pt p5" style="left:66%;top:74%"></span></div>
         <div class="retr">
-          <div class="ri key"><span class="rk">1</span><div class="rib"><div class="t">limits: high = 10</div><div class="dd">the exact value the bug ignores</div></div></div>
-          <div class="ri"><span class="rk">2</span><div class="rib"><div class="t">in_range(x, low, high)</div><div class="dd">how bounds are meant to work</div></div></div>
-          <div class="ri"><span class="rk">3</span><div class="rib"><div class="t">notes: “keep in range”</div><div class="dd">what clamp is supposed to do</div></div></div>
+          <div class="ri key"><span class="rk">1</span><div class="rib"><div class="t">BULK_BREAKS = [(100,.18),(50,.11),(10,.04)…]</div><div class="dd">distance 0.00 · the exact table the bug ignores</div></div></div>
+          <div class="ri"><span class="rk">2</span><div class="rib"><div class="t">bulk_discount — docstring</div><div class="dd">distance 0.59 · what the function should do</div></div></div>
+          <div class="ri"><span class="rk">3</span><div class="rib"><div class="t">test_bulk_discount_below</div><div class="dd">distance 0.71 · an existing test, as a guide</div></div></div>
         </div>
       </div>
-      <div class="note rise d4"><span class="m"></span><p>The top result is the fact <b style="color:var(--lav)">high = 10</b>, stored in a different file. Closed-book generation never sees it — the version with a memory does.</p></div>
+      <div class="note rise d4"><span class="m"></span><p>The top hit is the fact <b style="color:var(--lav)">10 → 0.04</b>, pulled straight to the front. Closed-book generation never sees it — the version with a memory does.</p></div>
     </section>
 
     <!-- 7 -->
@@ -613,11 +693,11 @@ PIPELINE = r"""<style>
       <h2 class="rise d1">Closed-book vs. informed</h2>
       <div class="g2">
         <div class="col rise d2"><h4>Closed-book</h4><p class="who">sees: only the bug</p>
-          <div class="typed" id="wkTypeA"></div><span class="verd miss" id="wkVerdA">tests a middle number — the bug survives</span></div>
-        <div class="col win rise d3"><h4>With the memory</h4><p class="who s">sees: the bug + “high = 10”</p>
-          <div class="typed" id="wkTypeB"></div><span class="verd kill" id="wkVerdB">tests the exact cap — caught</span></div>
+          <div class="typed" id="wkTypeA"></div><span class="verd miss" id="wkVerdA">guessed 0.1 — wrong, so the test is invalid</span></div>
+        <div class="col win rise d3"><h4>With the memory</h4><p class="who s">sees: the bug + “10 → 0.04”</p>
+          <div class="typed" id="wkTypeB"></div><span class="verd kill" id="wkVerdB">read 0.04 from the table — the bug is caught</span></div>
       </div>
-      <div class="note rise d4"><span class="m"></span><p>Closed-book, the AI guesses a safe but useless test. Handed the fact <b style="color:var(--lav)">high = 10</b>, it tests <b style="color:var(--matcha)">clamp(15) should be 10</b> — right where the bug lives.</p></div>
+      <div class="note rise d4"><span class="m"></span><p>Closed-book, the AI <b style="color:var(--rose)">guesses 0.1</b> and gets it wrong. Handed the fact <b style="color:var(--lav)">10 → 0.04</b>, it writes <b style="color:var(--matcha)">assert bulk_discount(10) == 0.04</b> — right where the bug lives.</p></div>
     </section>
 
     <!-- 8 -->
@@ -625,11 +705,11 @@ PIPELINE = r"""<style>
       <p class="narr rise">A real catch must do two things — pass on the correct code and fail on the broken code.</p>
       <h2 class="rise d1">The verdict</h2>
       <div class="judge">
-        <div class="jb rise d2"><div class="r">the new test, on correct code</div><div class="o">clamp(15) → 10 ✓ expected 10</div><span class="vb p">passes, as it should</span></div>
-        <div class="jb rise d3"><div class="r">the same test, on broken code</div><div class="o">clamp(15) → 15 ✗ expected 10</div><span class="vb f">fails — the bug is caught</span></div>
+        <div class="jb rise d2"><div class="r">the new test, on correct code</div><div class="o">bulk_discount(10) → 0.04 ✓ expected 0.04</div><span class="vb p">passes, as it should</span></div>
+        <div class="jb rise d3"><div class="r">the same test, on broken code</div><div class="o">bulk_discount(10) → 0.0 ✗ expected 0.04</div><span class="vb f">fails — the bug is caught</span></div>
       </div>
       <div class="stamp">Bug caught</div>
-      <p class="foot rise d4">If a test fails this check, the AI gets one hint and tries again. Generation is deterministic, so the results are repeatable.</p>
+      <p class="foot rise d4">If a test fails this check, the AI gets one hint and tries again. Generation runs at temperature 0, so the results are repeatable.</p>
     </section>
 
     <!-- 9 -->
@@ -649,6 +729,26 @@ PIPELINE = r"""<style>
         </div>
       </div>
       <div class="note rise d4"><span class="m"></span><p>The takeaway: a memory of the codebase helps most when the answer lives <b style="color:var(--lav)">somewhere else</b> in the code — and honestly, not at all when it doesn't. <a href="/research-questions">See the full results →</a></p></div>
+    </section>
+
+    <!-- 10 -->
+    <section class="scene" data-label="Glossary">
+      <p class="narr rise">Every term we used — in one place, in plain English.</p>
+      <h2 class="rise d1">The words, explained</h2>
+      <div class="gloss">
+        <div class="gt rise d1"><b>Mutation testing</b><span>Deliberately planting a small bug in working code to check whether the tests notice. If they don't, that's a measured gap.</span></div>
+        <div class="gt rise d1"><b>Mutant</b><span>One such planted bug — a single small change to the code, like deleting one line.</span></div>
+        <div class="gt rise d1"><b>Kill / catch</b><span>A test “kills” a bug when it passes on the correct code but fails on the buggy code — proof it actually caught it.</span></div>
+        <div class="gt rise d2"><b>RAG (Retrieval-Augmented Generation)</b><span>Giving the AI a searchable copy of the codebase so it can look facts up instead of guessing them.</span></div>
+        <div class="gt rise d2"><b>Retrieval</b><span>Fetching the few most relevant pieces from that memory for the task at hand.</span></div>
+        <div class="gt rise d2"><b>Embedding / “by meaning”</b><span>Turning each piece of code into numbers, so things with similar meaning sit close together and are easy to find.</span></div>
+        <div class="gt rise d3"><b>Distance</b><span>How close two pieces are in meaning. 0.00 is an (almost) exact match — the closest possible.</span></div>
+        <div class="gt rise d3"><b>Closed-book</b><span>The AI works from memory alone, with no lookups. It's our comparison baseline.</span></div>
+        <div class="gt rise d3"><b>Docstring</b><span>The short description written at the top of a function that says what it is supposed to do.</span></div>
+        <div class="gt rise d4"><b>ctxlib</b><span>The small test codebase we built for this study (“context library”) — a billing/grading library whose answers live in a separate file.</span></div>
+        <div class="gt rise d4"><b>Retrieval depth (k)</b><span>How many pieces we fetch from the memory each time — we tried 3, 5, and 8.</span></div>
+        <div class="gt rise d4"><b>Temperature 0</b><span>A setting that makes the AI deterministic: the same input always gives the same test, so results are repeatable.</span></div>
+      </div>
     </section>
   </div>
 
@@ -687,8 +787,8 @@ PIPELINE = r"""<style>
       var a=document.getElementById('wkTypeA'),b=document.getElementById('wkTypeB');
       var vA=document.getElementById('wkVerdA'),vB=document.getElementById('wkVerdB');
       vA.classList.remove('show');vB.classList.remove('show');
-      typeInto(a,"def test_clamp():\n    assert clamp(3) == 3",36,function(){vA.classList.add('show');});
-      setTimeout(function(){typeInto(b,"def test_cap():\n    assert clamp(15) == 10",36,function(){vB.classList.add('show');});},1500);
+      typeInto(a,"def test_bulk_discount():\n    assert bulk_discount(10) == 0.1",34,function(){vA.classList.add('show');});
+      setTimeout(function(){typeInto(b,"def test_bulk_discount():\n    assert bulk_discount(10) == 0.04",34,function(){vB.classList.add('show');});},1700);
     }
   }
   function go(idx){
@@ -1099,23 +1199,32 @@ def _run_job(job_id: str, path: Path, description: str, limit: int,
 @app.route("/generate", methods=["GET", "POST"])
 def generate():
     if request.method == "POST":
-        f = request.files["pyfile"]
-        if not f.filename.endswith(".py"):
-            abort(400, "need a .py file")
+        f = request.files.get("pyfile")
+        if f is None or not f.filename:
+            abort(400, "no file uploaded")
+        # Validate and sanitise every piece of user input before it touches the
+        # pipeline (see core/input_security.py): safe name, real Python source,
+        # bounded free-text.
+        try:
+            safe_name = safe_filename(f.filename)
+            source = validate_source(f.read())
+            description = clean_description(request.form.get("description", ""))
+        except InputRejected as exc:
+            abort(400, str(exc))
         UPLOADS.mkdir(parents=True, exist_ok=True)
-        dest = UPLOADS / f"{int(time.time())}_{Path(f.filename).name}"
-        f.save(dest)
+        dest = UPLOADS / f"{int(time.time())}_{safe_name}"
+        dest.write_text(source, encoding="utf-8")
         job_id = uuid.uuid4().hex
         try:
-            limit = max(1, int(request.form.get("limit", "15")))
+            limit = max(1, min(200, int(request.form.get("limit", "15"))))
         except ValueError:
             limit = 15
         with _JOBS_LOCK:
-            JOBS[job_id] = {"id": job_id, "filename": f.filename,
+            JOBS[job_id] = {"id": job_id, "filename": safe_name,
                             "status": "running", "started": time.time(),
                             "report": None, "error": None}
         threading.Thread(target=_run_job, daemon=True,
-                         args=(job_id, dest, request.form["description"],
+                         args=(job_id, dest, description,
                                limit, "skip_semantic" in request.form,
                                "use_rag" in request.form)).start()
         return redirect(url_for("job_page", job_id=job_id))
