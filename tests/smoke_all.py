@@ -406,10 +406,66 @@ def test_core_misc():
           "srcmap OK")
 
 
+# ------------------------------------------------ input security
+def test_input_security():
+    from core.input_security import (safe_filename, validate_source,
+                                     clean_description, InputRejected)
+    # good path
+    assert safe_filename("mymod.py") == "mymod.py"
+    assert validate_source(b"def f():\n    return 1\n").startswith("def f")
+    assert clean_description("  hi\x07 there  ") == "hi there"
+    # path traversal / absolute paths collapse to a safe basename
+    assert safe_filename("../../etc/passwd.py") == "passwd.py"
+    assert safe_filename(r"C:\Windows\evil.py") == "evil.py"
+    # rejected names
+    for bad in ("evil.txt", "", "   ", "..."):
+        try:
+            safe_filename(bad)
+            raise AssertionError(f"accepted bad filename {bad!r}")
+        except InputRejected:
+            pass
+    # rejected source: empty, binary, non-utf8, oversized, syntax error
+    for raw in (b"", b"ok\x00bytes", b"\xff\xfe", b"x" * 1_000_001,
+                b"def broken(:\n"):
+        try:
+            validate_source(raw)
+            raise AssertionError("accepted bad source")
+        except InputRejected:
+            pass
+    print("  input_security: safe names, traversal, source validation OK")
+
+
+# ------------------------------------------------ checkpoint / resume
+def test_checkpoint():
+    from module4_eval.checkpoint import Checkpoint
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "_ck.jsonl"
+        ck = Checkpoint(p)
+        assert ck.load() == []
+        ck.record({"mutant_id": "m1", "condition": "NO_RAG", "k": None,
+                   "status": "KILLED"})
+        ck.record({"mutant_id": "m1", "condition": "RAG", "k": 3,
+                   "status": "SURVIVED"})
+        assert ck.is_done("m1", "NO_RAG", None)
+        assert ck.is_done("m1", "RAG", 3)
+        assert not ck.is_done("m1", "RAG", 5)
+        # crash + resume: a fresh Checkpoint reconstructs the done-set
+        resumed = Checkpoint(p)
+        assert len(resumed.load()) == 2 and resumed.is_done("m1", "RAG", 3)
+        # tolerate a half-written trailing line from a hard crash
+        with p.open("a", encoding="utf-8") as fh:
+            fh.write('{"mutant_id": "m2", "condi')
+        assert len(Checkpoint(p).load()) == 2   # truncated line dropped
+        ck.clear()
+        assert not p.exists()
+    print("  checkpoint: record, resume, skip-done, tolerate-truncation OK")
+
+
 ALL = [test_sdl_generator, test_hom_combiner, test_schema_roundtrip,
        test_mutmut_results_parser, test_ollama_client_rest,
        test_prompt_templates, test_agentic_retry_loop,
-       test_metrics_and_figures, test_core_misc]
+       test_metrics_and_figures, test_core_misc,
+       test_input_security, test_checkpoint]
 
 if __name__ == "__main__":
     failed = 0

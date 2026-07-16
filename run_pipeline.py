@@ -40,6 +40,7 @@ def phase_generate(cfg, args, client):
     from module2_rag.retriever import Retriever
     from module4_eval.metrics_logger import log_metrics
     from module4_eval.validator import audit_results
+    from module4_eval.checkpoint import Checkpoint
 
     mutants = schema.load_mutants(resolve(cfg, cfg["output"]["surviving_mutants"]))
     if args.limit and args.limit < len(mutants):
@@ -51,14 +52,25 @@ def phase_generate(cfg, args, client):
         mutants = random.Random(42).sample(mutants, args.limit)
     print(f"[pipeline] generating tests for {len(mutants)} mutants")
 
-    all_results = []
+    # Crash-safe checkpoint: each result is streamed to an append-only side-file
+    # and a rerun of the SAME command resumes, skipping finished work. Vital for
+    # the overnight run on a machine without Claude Code to babysit it.
+    results_dir = resolve(cfg, cfg["output"]["results_dir"])
+    ck = Checkpoint(results_dir / f"_checkpoint_{args.repo}.jsonl")
+    all_results = ck.load()
+    if all_results:
+        print(f"[pipeline] resuming from {ck.path.name}: "
+              f"{len(all_results)} results already recorded")
     conditions = (["NO_RAG", "RAG"] if args.conditions == "both"
                   else [args.conditions])
 
     if "NO_RAG" in conditions:
         for m in mutants:
+            if ck.is_done(m["mutant_id"], "NO_RAG", None):
+                continue
             r = generate_and_validate(cfg, args.repo, m, None, "NO_RAG", client)
             print(f"[NO_RAG] {m['mutant_id']}: {r['status']}")
+            ck.record(r)
             all_results.append(r)
 
     if "RAG" in conditions:
@@ -69,17 +81,21 @@ def phase_generate(cfg, args, client):
             # protocol between Retrieval Agent and Test Generation Agent).
             retrieval_agent.run(cfg, args.repo, k=k)
             for m in mutants:
+                if ck.is_done(m["mutant_id"], "RAG", k):
+                    continue
                 chunks = retriever.retrieve(m, k)
                 r = generate_and_validate(cfg, args.repo, m, chunks, "RAG",
                                           client, k=k)
                 print(f"[RAG k={k}] {m['mutant_id']}: {r['status']}")
+                ck.record(r)
                 all_results.append(r)
 
     tag = f"{args.repo}"
     log_metrics(cfg, all_results, tag)
     audit_results(all_results)
-    raw = resolve(cfg, cfg["output"]["results_dir"]) / f"records_{tag}.json"
+    raw = results_dir / f"records_{tag}.json"
     raw.write_text(json.dumps(all_results, indent=2), encoding="utf-8")
+    ck.clear()  # consolidated into records_<tag>.json — drop the side-file
 
 
 def phase_evaluate(cfg, args):
